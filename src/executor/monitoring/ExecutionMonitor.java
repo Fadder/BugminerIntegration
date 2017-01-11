@@ -308,11 +308,21 @@ public class ExecutionMonitor {
 					methodExecutionLogger.reset();
 
 					if (metaMethodenTestsuitExecuter.get(event.location().method().toString()).equals("Erfolgreich")) {
-						System.out.println("!!!!!!!!!!!!!!!!!Testfall war erfolgreich!!!!!!!!!!!!!!!!!!!!!!!");
+						try {
+							queue.put(new Edge("",-1,1));
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						return;
 					} else if (metaMethodenTestsuitExecuter.get(event.location().method().toString())
 							.equals("Testfall ist gefailt")) {
-						System.out.println("!!!!!!!!!!!!!!!!!!!!!!Testfall war nicht erfolgreich!!!!!!!!!!!!!!!!!!!");
+						try {
+							queue.put(new Edge("",-1,0));
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						return;
 					} else {
 						throw new IllegalStateException("Irgendwas stimmt mit der Hashmap nicht");

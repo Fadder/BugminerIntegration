@@ -14,7 +14,6 @@ public class TestConsumer {
 	}
 
 	public void consume(IProgressMonitor monitor) {
-//		long i=0;
 		while (true) {
 			if (monitor.isCanceled()) {
 				throw new OperationCanceledException();
@@ -29,12 +28,20 @@ public class TestConsumer {
 
 			if (transition != null) {
 				if(transition.isFinished()){break;}
+				
+				if(transition.isTestCaseFinished()){
+					if(transition.isFailure()){
+						System.out.println("Test failed");
+					}else{
+						System.out.println("Test success");
+					}
+					continue;
+				}
 				System.out.println("----------------------------------");
 				System.out.println("CalledFrom: " + transition.getEnteredFromMethod());
 				System.out.println("Methodenname: " + transition.getMethod());
 				System.out.println("lineFrom: " + transition.getLineFrom());
 				System.out.println("lineTo: " + transition.getLineTo());
-//				System.out.println(i++);
 			}
 		}
 	}
