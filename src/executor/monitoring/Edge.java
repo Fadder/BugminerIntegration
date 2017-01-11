@@ -33,7 +33,15 @@ public class Edge {
     }
 
     public boolean isFinished() {
-        return method.equals("");
+        return method.equals("")&&lineTo==-1;
+    }
+    
+    public boolean isTestCaseFinished(){
+    	return method.equals("")&&lineTo!=-1;
+    }
+    
+    public boolean isFailure(){
+    	return lineTo==0;
     }
 
     public boolean isFirstLine() {
