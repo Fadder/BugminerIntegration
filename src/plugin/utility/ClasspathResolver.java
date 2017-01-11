@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProject;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -32,47 +33,72 @@ public class ClasspathResolver {
 			e.printStackTrace();
 		}
 		javaProject = JavaCore.create(project);
-		
-		StringBuilder classpathBuilder= new StringBuilder();
+
+		StringBuilder classpathBuilder = new StringBuilder();
 		classpathBuilder.append('\"');
 
-		for(String dependencies: getExternalDependencies(javaProject)){
+		for (String dependencies : getExternalDependencies(javaProject)) {
 			classpathBuilder.append(dependencies).append(separator);
 		}
-		for(String dependencies: getExecutorDependencies()){
+		for (String dependencies : getExecutorDependencies()) {
 			classpathBuilder.append(dependencies).append(separator);
 		}
-		for(String dependencies: BinaryLocator.getBinaryFolders(javaProject)){
+		for (String dependencies : BinaryLocator.getBinaryFolders(javaProject)) {
 			classpathBuilder.append(dependencies).append(separator);
 		}
-		classpathBuilder.deleteCharAt(classpathBuilder.length()-1);
-		
+		classpathBuilder.deleteCharAt(classpathBuilder.length() - 1);
+
 		classpathBuilder.append('\"');
 		return classpathBuilder.toString();
-	}	
-	
-	
-	private static List<String> getExternalDependencies(IJavaProject javaProject){
-		List<String> externalDependencies=new ArrayList<>();
+	}
+
+	private static List<String> getExternalDependencies(IJavaProject javaProject) {
+		List<String> externalDependencies = new ArrayList<>();
 
 		try {
-			IClasspathEntry[] classpathEntries = javaProject.getResolvedClasspath(true);
-			for (IClasspathEntry entry : classpathEntries) {
+			for (IClasspathEntry entry : javaProject.getRawClasspath()) {
+				if (entry.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
+					entry = JavaCore.getResolvedClasspathEntry(entry);
+				}
 				if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
 					externalDependencies.add(entry.getPath().toString());
 				}
+				if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+					IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject);
+					if (container.getKind() == IClasspathContainer.K_APPLICATION) {
+						for (IClasspathEntry innerEntry : container.getClasspathEntries()) {
+							if (innerEntry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+								externalDependencies.add(innerEntry.getPath().toString());
+							}
+						}
+					}
+				}
+
 			}
-		} catch (JavaModelException e) {
+
+		} catch (JavaModelException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
+
+		// try {
+		// IClasspathEntry[] classpathEntries =
+		// javaProject.getResolvedClasspath(true);
+		// for (IClasspathEntry entry : classpathEntries) {
+		// if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+		// externalDependencies.add(entry.getPath().toString());
+		// }
+		// }
+		// } catch (JavaModelException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		return externalDependencies;
-		
 	}
 
 	private static List<String> getExecutorDependencies() {
-		List<String> executorDependencies=new ArrayList<>();
-		
+		List<String> executorDependencies = new ArrayList<>();
+
 		Bundle bundle = FrameworkUtil.getBundle(ClasspathResolver.class);
 		if (bundle == null) {
 			System.err.println("can't find bundle");
@@ -87,7 +113,7 @@ public class ClasspathResolver {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		return executorDependencies;
 	}
 }
