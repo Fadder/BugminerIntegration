@@ -6,12 +6,10 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
-import org.junit.runners.JUnit4;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -73,7 +71,7 @@ public class TestsuitExecuter {
         JUnitCore jUnitCore = new JUnitCore();
 
 
-        for (Class testClass : testClasses) {
+        for (Class<?> testClass : testClasses) {
             testMethods = new ArrayList<>();
 
             //Alle TestMethoden pro Klasse werden gesammelt
@@ -94,7 +92,7 @@ public class TestsuitExecuter {
                 request = Request.method(testClass, testMethod.getName());
                 Result result = jUnitCore.run(request);
 
-                if (result.getFailures().size() == 1) {
+                if (result.getFailureCount() >= 1) {
                     //TestCase hat gefailt
 
 

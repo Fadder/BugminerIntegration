@@ -17,10 +17,10 @@ import java.util.Map;
 public class JVMConnectionCreator {
 
     private String testsuitExecuterMainClass;//das ist die Klasse: TestsuitExecuter
-    private String[] testClasses; //sind die Ausfuehrungsparameter von TestsuitExecuter
+    private List<String> testClasses; //sind die Ausfuehrungsparameter von TestsuitExecuter
     private String classpath;
 
-    public JVMConnectionCreator(String testsuitExecuterMainClass, String[] testClasses, String classpath) {
+    public JVMConnectionCreator(String testsuitExecuterMainClass, List<String> testClasses, String classpath) {
         this.testsuitExecuterMainClass = testsuitExecuterMainClass;
         this.testClasses = testClasses;
         this.classpath = classpath;
@@ -74,8 +74,8 @@ public class JVMConnectionCreator {
         Connector.Argument mainClass = connectionProperties.get("main");
         String applicationNameWithParameters = testsuitExecuterMainClass + " ";
         //Testklassen werden als Parameter uebergeben
-        for(int i = 0; i < testClasses.length; i++) {
-            applicationNameWithParameters = applicationNameWithParameters + testClasses[i] + " ";
+        for(String testClass: testClasses) {
+            applicationNameWithParameters = applicationNameWithParameters + testClass + " ";
         }
         mainClass.setValue(applicationNameWithParameters);
 
