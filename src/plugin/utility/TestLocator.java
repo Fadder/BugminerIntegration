@@ -16,48 +16,60 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+
 public class TestLocator {
 	
-
+	/**
+	 * Findet alle Testklassen für das Projekt
+	 * @param project das Projekt
+	 * @return alle Testklassen mit vollqualifizierten Namen
+	 */
 	public static List<String> findTestClasses(IProject project){
 		List<String> fullyQualifiedTestClasses = new ArrayList<>();
 		IJavaProject javaProject=null;
+		// Wir untersuchen nur java Projekte
 		try {
 			if (!project.getDescription().hasNature(JavaCore.NATURE_ID)) {
 				throw new MalformedParametersException();
 			}
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		
 		javaProject=JavaCore.create(project);
+		
+		
 		boolean found=false;
+		
+		
+		// Findet über die Eclipse API alle Klassen, die eine Methode haben, die mit @Test annotiert ist
+		// TODO das hier evtl auflösen bzw einen besseren Weg finden die Testklassen sicher zu differenzieren??
 		try {
 			for(IPackageFragment fragment:javaProject.getPackageFragments()){
 				if(fragment.getKind()==IPackageFragmentRoot.K_SOURCE){
+					//gehe durch alle Package Fragmente, die source dateien enthalten
 					for(ICompilationUnit unit:fragment.getCompilationUnits()){
 						for(IType type: unit.getAllTypes()){
+							// durch alle Klassen
 							for(IMethod method: type.getMethods()){
+								// durch alle Methoden
 								for(IAnnotation annotation: method.getAnnotations()){
+									// testen, ob eine @Test Annotation besteht
 									if(annotation.getElementName().equals("Test")){
 										found=true;
+										fullyQualifiedTestClasses.add(type.getFullyQualifiedName());
 									}
 									if(found){break;}
 								}
 								if(found){break;}
 							}
-							if(found){fullyQualifiedTestClasses.add(type.getFullyQualifiedName()) ;break;}
+							if(found){break;}
 						}
-						if(found){
-							found=false;
-						}
+						if(found){	found=false;}
 					}
 				}
 			}
 		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
