@@ -1,47 +1,26 @@
 package plugin.utility;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.MalformedParametersException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 
 public class TestLocator {
 	
 
-	
-	private static List<String> searchFoldersForTests(Set<String> foldersToCheck){
-		List<String> testClasses = new ArrayList<>();
-		
-		for(String folder: foldersToCheck){
-			Path sourceFolder= new File(folder).toPath();
-		try {
-			Files.walk(sourceFolder).filter(file -> file.getFileName().toString().endsWith(".class"))
-			.map(path -> sourceFolder.relativize(path).toString())
-			.filter(x-> !x.contains("$"))
-			.map(path -> path.replace('/', '.')).map(path -> path.replace('\\', '.'))
-			.map(name -> name.substring(0, name.length() - 6)).forEach(x -> testClasses.add(x));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
-		
-
-		return testClasses;
-	}
-	
-
 	public static List<String> findTestClasses(IProject project){
-		
+		List<String> fullyQualifiedTestClasses = new ArrayList<>();
 		IJavaProject javaProject=null;
 		try {
 			if (!project.getDescription().hasNature(JavaCore.NATURE_ID)) {
@@ -51,9 +30,37 @@ public class TestLocator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		javaProject=JavaCore.create(project);
-		Set<String> foldersToCheck=BinaryLocator.getBinaryFolders(javaProject);	
 		
-		return searchFoldersForTests(foldersToCheck);
+		
+		javaProject=JavaCore.create(project);
+		boolean found=false;
+		try {
+			for(IPackageFragment fragment:javaProject.getPackageFragments()){
+				if(fragment.getKind()==IPackageFragmentRoot.K_SOURCE){
+					for(ICompilationUnit unit:fragment.getCompilationUnits()){
+						for(IType type: unit.getAllTypes()){
+							for(IMethod method: type.getMethods()){
+								for(IAnnotation annotation: method.getAnnotations()){
+									if(annotation.getElementName().equals("Test")){
+										found=true;
+									}
+									if(found){break;}
+								}
+								if(found){break;}
+							}
+							if(found){fullyQualifiedTestClasses.add(type.getFullyQualifiedName()) ;break;}
+						}
+						if(found){
+							found=false;
+						}
+					}
+				}
+			}
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return fullyQualifiedTestClasses;
 	}
 }
