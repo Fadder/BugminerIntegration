@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,8 @@ import org.eclipse.jdt.core.JavaCore;
 import executor.monitoring.Edge;
 import executor.monitoring.ExecutionMonitor;
 import executor.monitoring.TestConsumer;
+import graphBuilder.Controller;
+import graphBuilder.MethodGraph;
 import plugin.utility.ClasspathResolver;
 import plugin.utility.TestLocator;
 
@@ -107,7 +110,8 @@ public class StartSettingDialog extends JDialog {
 
 				String classpath = ClasspathResolver.getClasspath(selectedProject);
 
-				LinkedBlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
+				BlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
+				BlockingQueue<MethodGraph> methodGraphStream = new LinkedBlockingQueue<>(100000);
 				String scope = scopeTextField.getText().replace("*", "");
 				
 				System.out.println("Classpath: "+ classpath);
@@ -129,8 +133,12 @@ public class StartSettingDialog extends JDialog {
 
 					@Override
 					protected IStatus run(IProgressMonitor arg0) {
-						TestConsumer consumer = new TestConsumer(edgeStream);
-						consumer.consume(arg0);
+						//TestConsumer consumer = new TestConsumer(edgeStream);
+						//consumer.consume(arg0);
+						Controller graphBuilder = new Controller(edgeStream, methodGraphStream);
+						graphBuilder.run();
+						// Thread graphBuilderThr = new Thread(graphBuilder);
+						
 						return Status.OK_STATUS;
 					}
 
@@ -146,8 +154,6 @@ public class StartSettingDialog extends JDialog {
 				consumerJob.schedule();
 	
 
-				// Controller graphBuilder = new Controller(edgeStream);
-				// Thread graphBuilderThr = new Thread(graphBuilder);
 				// graphBuilderThr.start();
 				setVisible(false);
 			}

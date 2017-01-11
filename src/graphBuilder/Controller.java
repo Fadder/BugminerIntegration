@@ -1,6 +1,7 @@
 package graphBuilder;
 
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import executor.monitoring.Edge;
 
@@ -9,13 +10,14 @@ import executor.monitoring.Edge;
  */
 public final class Controller implements Runnable{
 
-    private LinkedBlockingQueue<Edge> inputStream = new LinkedBlockingQueue<>();
+	private BlockingQueue<Edge> inputStream = new LinkedBlockingQueue<>();
+	private BlockingQueue<MethodGraph> outputStream = new LinkedBlockingQueue<>();
 
     private HashMap<String,MethodGraph> methodGraphs = new HashMap<>();
     
-    // TODO outputstream
-    public Controller(LinkedBlockingQueue<Edge> inputStream){
+    public Controller(BlockingQueue<Edge> inputStream, BlockingQueue<MethodGraph> outputStream){
     	this.inputStream = inputStream;
+    	this.outputStream = outputStream;
     }
 
     private void simpleTest() {
@@ -42,7 +44,7 @@ public final class Controller implements Runnable{
             e.printStackTrace();
         }
 
-        while(update()){
+        while(processTestCase()){
             // do nothing
             System.out.print(".");
         }
@@ -54,17 +56,23 @@ public final class Controller implements Runnable{
         System.out.println();
     }
     
+    // TODO
     public void run(){
-    	while(update()){
-    		// TODO
+    	while(true){
+	    	while(processTestCase()){
+	            // do nothing
+	        }
+	    	//outputStream.put();
     	}
     }
-
-    private boolean update(){
+    
+    // TODO
+    private boolean processTestCase(){
         try {
             Edge currentEdge = inputStream.take();
-            if(currentEdge.isFinished()){
-                return false;
+            if(currentEdge.isTestCaseFinished()){
+            	currentEdge.isFailure();
+            	return false;
             }
             MethodGraph methodGraph = methodGraphs.computeIfAbsent(currentEdge.getMethod(), k -> new MethodGraph(currentEdge.getMethod()));
             methodGraph.update(currentEdge);
