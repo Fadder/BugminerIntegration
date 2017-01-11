@@ -30,11 +30,6 @@ public class Plugin implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		MessageDialog.openInformation(
-			window.getShell(),
-			"Bugminer_CFG",
-			"Drawing Graph... later.");
-		
 		//Here we will open the GUI for the CFG.
 		Startpanel sp = new Startpanel();
 		sp.createAndStartPanel();
