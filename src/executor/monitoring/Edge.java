@@ -1,6 +1,5 @@
 package executor.monitoring;
 
-import java.util.Objects;
 
 // the edges are handed over in a java.util.concurrent.BlockingQueue<Edge>
 // someone creates a queue and gives it to the graph builder and executor
@@ -9,6 +8,9 @@ import java.util.Objects;
 // returned.
 
 public class Edge {
+	public static final Edge LAST_EDGE= new Edge("",-1,-1);
+	public static final Edge TESTCASE_SUCCESS= new Edge("",1 ,-2);
+	public static final Edge TESTCASE_FAILURE= new Edge("",0,-2);
 	// the method this edge is in --> package + classname + methodname
 	private String method;
 
@@ -19,40 +21,31 @@ public class Edge {
 	private int lineTo;
 
 	private String enteredFromMethod;
-	private boolean failure;
-
-	private Edge(Builder builder) {
-		this.method = Objects.requireNonNull(builder.method);
-		this.lineFrom = builder.lineFrom;
-		this.lineTo = builder.lineTo;
-		this.enteredFromMethod = builder.enteredFromMethod;
-		this.failure = builder.failure;
-	}
-	//
-	// public Edge(String method, int lineFrom, int lineTo) {
-	// this.method = method;
-	// this.lineFrom = lineFrom;
-	// this.lineTo = lineTo;
-	// }
-	//
-	// public Edge(String method, int lineFrom, int lineTo, String
-	// enteredFromMethod) {
-	// this.method = method;
-	// this.lineFrom = lineFrom;
-	// this.lineTo = lineTo;
-	// this.enteredFromMethod = enteredFromMethod;
-	// }
+	
+	 public Edge(String method, int lineFrom, int lineTo) {
+	 this.method = method;
+	 this.lineFrom = lineFrom;
+	 this.lineTo = lineTo;
+	 }
+	
+	 public Edge(String method, int lineFrom, int lineTo, String
+	 enteredFromMethod) {
+	 this.method = method;
+	 this.lineFrom = lineFrom;
+	 this.lineTo = lineTo;
+	 this.enteredFromMethod = enteredFromMethod;
+	 }
 
 	public boolean isFinished() {
 		return method.equals("") && lineTo == -1;
 	}
 
 	public boolean isTestCaseFinished() {
-		return method.equals("") && lineTo == 0;
+		return method.equals("") && lineTo == -2;
 	}
 
 	public boolean isFailure() {
-		return this.failure;
+		return this.lineFrom==0;
 	}
 
 	public boolean isFirstLine() {
@@ -63,91 +56,15 @@ public class Edge {
 		return method;
 	}
 
-	public void setMethod(String method) {
-		this.method = method;
-	}
-
 	public int getLineFrom() {
 		return lineFrom;
-	}
-
-	public void setLineFrom(int lineFrom) {
-		this.lineFrom = lineFrom;
 	}
 
 	public int getLineTo() {
 		return lineTo;
 	}
 
-	public void setLineTo(int lineTo) {
-		this.lineTo = lineTo;
-	}
-
 	public String getEnteredFromMethod() {
 		return enteredFromMethod;
-	}
-
-	public void setEnteredFromMethod(String enteredFromMethod) {
-		this.enteredFromMethod = enteredFromMethod;
-	}
-
-	public static class Builder {
-		private String method;
-		private int lineFrom;
-		private int lineTo;
-		private String enteredFromMethod;
-		private boolean failure;
-
-		public Builder() {
-
-		}
-
-		public Builder method(String methodName) {
-			this.method = methodName;
-			return this;
-		}
-
-		public Builder lineFrom(int lineFrom) {
-			this.lineFrom = lineFrom;
-			return this;
-		}
-
-		public Builder lineTo(int lineTo) {
-			this.lineFrom = lineTo;
-			return this;
-		}
-
-		public Builder enteredFrom(String enteredFrom) {
-			this.enteredFromMethod = enteredFrom;
-			return this;
-		}
-
-		public Edge successfulTestCase() {
-			this.method = "";
-			this.failure = false;
-			this.lineFrom = 0;
-			this.lineTo = 0;
-			return new Edge(this);
-		}
-
-		public Edge failedTestCase() {
-			this.method = "";
-			this.failure = true;
-			this.lineFrom = 0;
-			this.lineTo = 0;
-			return new Edge(this);
-		}
-
-		public Edge lastEdge() {
-			this.method = "";
-			this.lineFrom = -1;
-			this.lineTo = -1;
-			return new Edge(this);
-		}
-		
-		public Edge buildEdge(){
-			return new Edge(this);
-		}
-
 	}
 }

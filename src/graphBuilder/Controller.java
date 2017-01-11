@@ -19,17 +19,15 @@ public final class Controller implements Runnable{
     }
 
     private void simpleTest() {
-    	
-    	
-        Edge e11 = new Edge.Builder().method("m1").lineFrom(1).lineTo(2).buildEdge();
-        Edge e12 = new Edge.Builder().method("m1").lineFrom(2).lineTo(3).buildEdge();
-        Edge e13 = new Edge.Builder().method("m1").lineFrom(3).lineTo(4).buildEdge();
-        Edge e14 = new Edge.Builder().method("m1").lineFrom(1).lineTo(2).buildEdge();
-        Edge e21 = new Edge.Builder().method("m2").lineFrom(1).lineTo(2).buildEdge();
-        Edge e22 = new Edge.Builder().method("m2").lineFrom(1).lineTo(2).buildEdge();
-        Edge e23 = new Edge.Builder().method("m2").lineFrom(1).lineTo(2).buildEdge();
-        Edge e0  = new Edge.Builder().lastEdge();
-        
+        Edge e11 = new Edge("m1",1,2);
+        Edge e12 = new Edge("m1",2,3);
+        Edge e13 = new Edge("m1",3,4);
+        Edge e14 = new Edge("m1",1,2);
+        Edge e21 = new Edge("m2",1,2);
+        Edge e22 = new Edge("m2",1,2);
+        Edge e23 = new Edge("m2",1,2);
+        Edge e0  = Edge.LAST_EDGE;
+
         try {
             inputStream.put(e11);
             inputStream.put(e12);

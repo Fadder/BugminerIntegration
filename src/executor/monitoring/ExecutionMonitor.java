@@ -101,7 +101,7 @@ public class ExecutionMonitor {
 
 		handleEvents(vm);
 		try {
-			queue.put(new Edge.Builder().lastEdge());
+			queue.put(Edge.LAST_EDGE);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,7 +153,7 @@ public class ExecutionMonitor {
 			if (monitor.isCanceled()) {
 				vm.exit(-1);
 				try {
-					queue.put(new Edge.Builder().lastEdge());
+					queue.put(Edge.LAST_EDGE);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -309,7 +309,7 @@ public class ExecutionMonitor {
 
 					if (metaMethodenTestsuitExecuter.get(event.location().method().toString()).equals("Erfolgreich")) {
 						try {
-							queue.put(new Edge.Builder().successfulTestCase());
+							queue.put(Edge.TESTCASE_SUCCESS);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -318,7 +318,7 @@ public class ExecutionMonitor {
 					} else if (metaMethodenTestsuitExecuter.get(event.location().method().toString())
 							.equals("Testfall ist gefailt")) {
 						try {
-							queue.put(new Edge.Builder().failedTestCase());
+							queue.put(Edge.TESTCASE_FAILURE);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -381,8 +381,7 @@ public class ExecutionMonitor {
 
 	private void addTransitionMethodEntered(String fullyQualifiedMethodname, int lineTo, String enteredFromMethod) {
 		// addTransition(fullyQualifiedMethodname, -1, lineTo);
-		Edge transition = new Edge.Builder().method(fullyQualifiedMethodname)
-								.lineFrom(-1).lineTo(lineTo).enteredFrom(enteredFromMethod)	.buildEdge();
+		Edge transition = new Edge(fullyQualifiedMethodname, -1, lineTo, enteredFromMethod);
 
 		queue.add(transition);
 	}
@@ -392,7 +391,7 @@ public class ExecutionMonitor {
 //	}
 
 	private void addTransition(String fullyQualifiedMethodname, int lineFrom, int lineTo) {
-		Edge transition =new Edge.Builder().method(fullyQualifiedMethodname).lineFrom(lineFrom).lineTo(lineTo).buildEdge();
+		Edge transition = new Edge(fullyQualifiedMethodname, lineFrom, lineTo);
 
 		queue.add(transition);
 	}
