@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,7 @@ public class StartSettingDialog extends JDialog {
 	private JList<String> testClassList;
 	private List<IProject> projects;
 	private IProject selectedProject;
+	private Map<IProject, List<String>> testClassCache=new HashMap<>();
 
 	/**
 	 * 
@@ -53,7 +56,7 @@ public class StartSettingDialog extends JDialog {
 		// ========== Labels ==========
 
 		JLabel projectLabel = new JLabel("Project:");
-		JLabel testClassLabel = new JLabel("testClass:");
+		JLabel testClassLabel = new JLabel("Test classes:");
 		JLabel scopeLabel = new JLabel("Scope:");
 
 		// ========== Project list ==========
@@ -68,12 +71,10 @@ public class StartSettingDialog extends JDialog {
 		projectBox = new JComboBox<String>(projectnames);
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				selectProject();
+				refreshTestClasses();
 			}
 		};
-		if (projects.size() > 0) {
-			selectProject();
-		}
+
 		projectBox.addActionListener(listener);
 
 		// ========== testClass List ==========
@@ -109,10 +110,10 @@ public class StartSettingDialog extends JDialog {
 
 				LinkedBlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
 				String scope = scopeTextField.getText().replace("*", "");
-				
-				System.out.println("Classpath: "+ classpath);
-				System.out.println("testClasses: " + testClasses);
-				System.out.println("Scope: "+ scope);
+
+				System.out.println("Classpath: " + classpath);
+				System.out.println("Test classes: " + testClasses);
+				System.out.println("Scope: " + scope);
 
 				Job executionJob = new Job("debugging Testcase") {
 
@@ -135,16 +136,15 @@ public class StartSettingDialog extends JDialog {
 					}
 
 				};
-				JobGroup jobGroup= new JobGroup("Testing",2,2);
-				IProgressMonitor progressGroup=Job.getJobManager().createProgressGroup();
+				JobGroup jobGroup = new JobGroup("Testing", 2, 2);
+				IProgressMonitor progressGroup = Job.getJobManager().createProgressGroup();
 				executionJob.setJobGroup(jobGroup);
 				executionJob.setPriority(Job.LONG);
 				consumerJob.setPriority(Job.LONG);
-				executionJob.setProgressGroup(progressGroup,IProgressMonitor.UNKNOWN);
+				executionJob.setProgressGroup(progressGroup, IProgressMonitor.UNKNOWN);
 				consumerJob.setProgressGroup(progressGroup, IProgressMonitor.UNKNOWN);
 				executionJob.schedule();
 				consumerJob.schedule();
-	
 
 				// Controller graphBuilder = new Controller(edgeStream);
 				// Thread graphBuilderThr = new Thread(graphBuilder);
@@ -193,10 +193,25 @@ public class StartSettingDialog extends JDialog {
 		setSize(400, 300);
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(layout);
+		
+		
+		Job backgroundPreLoading=new Job("Preloading test classes"){
+
+			@Override
+			protected IStatus run(IProgressMonitor arg0) {
+				for(IProject project: projects){
+					testClassCache.computeIfAbsent(project,value-> TestLocator.findTestClasses(project));
+				}
+				return Status.OK_STATUS;
+			}
+			
+		};
+		backgroundPreLoading.setPriority(Job.DECORATE);
+		backgroundPreLoading.schedule();
 
 	}
-	
-	private boolean isJavaProject(IProject project){
+
+	private boolean isJavaProject(IProject project) {
 		try {
 			if (project.getDescription().hasNature(JavaCore.NATURE_ID)) {
 				return true;
@@ -208,11 +223,15 @@ public class StartSettingDialog extends JDialog {
 		return false;
 	}
 
-	private void selectProject() {
+	public void refreshTestClasses() {
 		testClassListModel.removeAllElements();
-		selectedProject = projects.get(projectBox.getSelectedIndex());
-		for (String testClass : TestLocator.findTestClasses(selectedProject)) {
-			testClassListModel.addElement(testClass);
+		int selection = projectBox.getSelectedIndex();
+		if (selection >= 0) {
+			selectedProject = projects.get(selection);
+			List<String> testClasses=testClassCache.computeIfAbsent(selectedProject,value-> TestLocator.findTestClasses(selectedProject));
+			for (String testClass : testClasses) {
+				testClassListModel.addElement(testClass);
+			}
 		}
 	}
 
