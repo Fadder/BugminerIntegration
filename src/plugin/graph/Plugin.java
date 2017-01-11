@@ -35,7 +35,6 @@ public class Plugin implements IWorkbenchWindowActionDelegate {
 		sp.createAndStartPanel();
 		
 		
-		System.out.println("Everything's fine.");
 		
 		
 	}
