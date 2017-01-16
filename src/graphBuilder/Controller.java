@@ -1,6 +1,5 @@
 package graphBuilder;
 
-import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import executor.monitoring.Edge;

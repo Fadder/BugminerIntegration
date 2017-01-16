@@ -37,7 +37,7 @@ import executor.monitoring.Edge;
 import executor.monitoring.ExecutionMonitor;
 import executor.monitoring.TestConsumer;
 import graphBuilder.Controller;
-import graphBuilder.MethodGraph;
+import graphBuilder.TestCase;
 import plugin.utility.ClasspathResolver;
 import plugin.utility.TestLocator;
 
@@ -111,7 +111,7 @@ public class StartSettingDialog extends JDialog {
 				String classpath = ClasspathResolver.getClasspath(selectedProject);
 
 				BlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
-				BlockingQueue<MethodGraph> methodGraphStream = new LinkedBlockingQueue<>(100000);
+				BlockingQueue<TestCase> TestCaseStream = new LinkedBlockingQueue<>(100000);
 				String scope = scopeTextField.getText().replace("*", "");
 				
 				System.out.println("Classpath: "+ classpath);
@@ -135,7 +135,7 @@ public class StartSettingDialog extends JDialog {
 					protected IStatus run(IProgressMonitor arg0) {
 						//TestConsumer consumer = new TestConsumer(edgeStream);
 						//consumer.consume(arg0);
-						Controller graphBuilder = new Controller(edgeStream, methodGraphStream);
+						Controller graphBuilder = new Controller(edgeStream, TestCaseStream);
 						graphBuilder.run();
 						// Thread graphBuilderThr = new Thread(graphBuilder);
 						
