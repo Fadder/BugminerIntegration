@@ -22,13 +22,5 @@ public class TestCase {
 	public void setSuccessful(boolean isSuccessful) {
 		this.isSuccessful = isSuccessful;
 	}
-	
-	private void printAllTransitions(){
-        for(MethodGraph methodGraph: methodGraphs.values()){
-            System.out.println("Method: " + methodGraph.methodId);
-            methodGraph.printAllTransitions();
-            System.out.println();
-        }
-    }
-	
+		
 }
