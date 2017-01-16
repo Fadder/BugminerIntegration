@@ -101,7 +101,7 @@ public class ExecutionMonitor {
 
 		handleEvents(vm);
 		try {
-			queue.put(new Edge("",-1,-1));
+			queue.put(Edge.LAST_EDGE);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,7 +153,7 @@ public class ExecutionMonitor {
 			if (monitor.isCanceled()) {
 				vm.exit(-1);
 				try {
-					queue.put(new Edge("",-1,-1));
+					queue.put(Edge.LAST_EDGE);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -309,7 +309,7 @@ public class ExecutionMonitor {
 
 					if (metaMethodenTestsuitExecuter.get(event.location().method().toString()).equals("Erfolgreich")) {
 						try {
-							queue.put(new Edge("",-1,1));
+							queue.put(Edge.TESTCASE_SUCCESS);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -318,7 +318,7 @@ public class ExecutionMonitor {
 					} else if (metaMethodenTestsuitExecuter.get(event.location().method().toString())
 							.equals("Testfall ist gefailt")) {
 						try {
-							queue.put(new Edge("",-1,0));
+							queue.put(Edge.TESTCASE_FAILURE);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
