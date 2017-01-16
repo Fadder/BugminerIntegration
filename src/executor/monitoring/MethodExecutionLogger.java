@@ -72,7 +72,7 @@ public class MethodExecutionLogger {
             lineNumbers.removeLast();
             indexOfLineNumbersList--;
         }
-        System.err.println("Checked Exception wurde nich vom eigenen ProjektKlassen gefangen?");
+//        System.err.println("Checked Exception wurde nich vom eigenen ProjektKlassen gefangen?");
 
     }
 
