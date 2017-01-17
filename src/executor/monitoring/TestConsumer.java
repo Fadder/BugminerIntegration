@@ -37,11 +37,8 @@ public class TestConsumer {
 					}
 					continue;
 				}
-				System.out.println("----------------------------------");
-				System.out.println("CalledFrom: " + transition.getEnteredFromMethod());
-				System.out.println("Methodenname: " + transition.getMethod());
-				System.out.println("lineFrom: " + transition.getLineFrom());
-				System.out.println("lineTo: " + transition.getLineTo());
+
+				System.out.println(transition.getMethod()+" "+transition.getLineFrom()+"->"+transition.getLineTo());
 			}
 		}
 	}
