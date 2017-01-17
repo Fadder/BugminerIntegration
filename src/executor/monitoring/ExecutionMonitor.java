@@ -24,17 +24,13 @@ public class ExecutionMonitor {
 
 	private static final String executorClassName = "executor.testexecution.TestsuitExecuter";
 
-	// hier muss man die Markierungsmethoden von dem Testsuitexecuter aufnehmen
-
 	// Requests, die gefiltert werden sollen
 	private MethodEntryRequest methodEntryRequest;
-	private MethodExitRequest methodExitRequest;
-	private StepRequest stepRequest;
-	private ExceptionRequest exceptionRequest;
+
 
 	/**
-	 * dafÃ¼r da, falls die Testklassen als String uebergeben werden Testklassen
-	 * mÃ¼ssen vollqualifiziert sein z.B.
+	 * dafür da, falls die Testklassen als String uebergeben werden Testklassen
+	 * müssen vollqualifiziert sein z.B.
 	 * org.execution_monitor.main.zuTestendeKlassen.HalloWeltTest
 	 */
 	public ExecutionMonitor(String classpath, BlockingQueue<Edge> queue, String projectPackageNameToMonitor,
@@ -59,7 +55,7 @@ public class ExecutionMonitor {
 		}
 		VirtualMachine vm = jvmConnectionCreator.launchAndConnectToTestsuitExecuter();
 
-		// TODO Input und Output umleiten, da sonst VM abstÃ¼rzen kann
+		// TODO Input und Output umleiten, da sonst VM abstürzen kann
 		Process proc = vm.process();
 		new Thread(new IORedirecter(proc.getInputStream(), System.out)).start();
 		new Thread(new IORedirecter(proc.getErrorStream(), System.err)).start();
@@ -78,10 +74,10 @@ public class ExecutionMonitor {
 		EventRequestManager eventRequestManager = vm.eventRequestManager();
 		ThreadReference mainThread=getMainThreadReferenceFrom(vm);
 		methodEntryRequest = eventRequestManager.createMethodEntryRequest();
-		methodExitRequest = eventRequestManager.createMethodExitRequest();
-		stepRequest = eventRequestManager.createStepRequest(mainThread, StepRequest.STEP_LINE,
+		MethodExitRequest methodExitRequest = eventRequestManager.createMethodExitRequest();
+		StepRequest stepRequest = eventRequestManager.createStepRequest(mainThread, StepRequest.STEP_LINE,
 				StepRequest.STEP_INTO);
-		exceptionRequest = eventRequestManager.createExceptionRequest(null, true, false);
+		ExceptionRequest exceptionRequest = eventRequestManager.createExceptionRequest(null, true, false);
 
 		methodEntryRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
 		methodExitRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
@@ -89,8 +85,15 @@ public class ExecutionMonitor {
 		exceptionRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
 
 		for (String testClass : testClasses) {
-			excludePackage(testClass);
+			methodEntryRequest.addClassExclusionFilter(testClass);
+			methodExitRequest.addClassExclusionFilter(testClass);
+			stepRequest.addClassExclusionFilter(testClass);
+			exceptionRequest.addClassExclusionFilter(testClass);
 		}
+		methodExitRequest.addClassFilter(projectPackageNameToMonitor+"*");
+		stepRequest.addClassFilter(projectPackageNameToMonitor+"*");
+		exceptionRequest.addClassFilter(projectPackageNameToMonitor+"*");
+		
 		methodEntryRequest.addThreadFilter(mainThread);
 		methodExitRequest.addThreadFilter(mainThread);
 		exceptionRequest.addThreadFilter(mainThread);
@@ -99,13 +102,6 @@ public class ExecutionMonitor {
 		methodExitRequest.enable();
 		stepRequest.enable();
 		exceptionRequest.enable();
-	}
-
-	private void excludePackage(String excludePackage) {
-		methodEntryRequest.addClassExclusionFilter(excludePackage);
-		methodExitRequest.addClassExclusionFilter(excludePackage);
-		stepRequest.addClassExclusionFilter(excludePackage);
-		exceptionRequest.addClassExclusionFilter(excludePackage);
 	}
 
 	private void handleEvents(VirtualMachine vm) {
@@ -143,11 +139,6 @@ public class ExecutionMonitor {
 			while (eventIterator.hasNext()) {
 				Event event = eventIterator.nextEvent();
 
-				// Events werden rausgefiltert
-				if (filterEvent(event)) {
-					continue;
-				}
-
 				if (event instanceof MethodEntryEvent) {
 					try {
 						handleMethodEntryEvent((MethodEntryEvent) event);
@@ -184,13 +175,8 @@ public class ExecutionMonitor {
 	 * True --> Event soll ignoriert werden False --> bei Events aus dem
 	 * Testprojekt und TestsuitExecuter
 	 */
-	private boolean filterEvent(Event event) {
-		if (!(event instanceof Locatable)) {
-			return true;
-		}
-		
-		Locatable locable = (Locatable) event;
-		String eventClass = locable.location().declaringType().name();
+	private boolean filterEvent(MethodEntryEvent event) {
+		String eventClass = event.location().declaringType().name();
 		if (eventClass.equals(executorClassName) || eventClass.startsWith(projectPackageNameToMonitor)) {
 			return false;
 		}
@@ -201,18 +187,12 @@ public class ExecutionMonitor {
 			String subString = eventClass.substring(0, newPos + 1);
 
 			if (!projectPackageNameToMonitor.startsWith(subString) && !executorClassName.startsWith(subString)) {
-				methodEntryRequest.disable();
-				methodExitRequest.disable();
-				stepRequest.disable();
-				exceptionRequest.disable();
+				methodEntryRequest.disable();		
 
 				String newFilter = subString + "*";
-				excludePackage(newFilter);
+				methodEntryRequest.addClassExclusionFilter(newFilter);
 
 				methodEntryRequest.enable();
-				methodExitRequest.enable();
-				stepRequest.enable();
-				exceptionRequest.enable();
 				return true;
 			}
 			oldPos = newPos;
@@ -225,20 +205,14 @@ public class ExecutionMonitor {
 	private void handleStepEvent(StepEvent event) {
 		Location location = event.location();
 		Method method = location.method();
-		String methodname = method.toString();
 		if (!method.isConstructor() && !method.isStaticInitializer()) {
-			if (methodname.startsWith(executorClassName)) {
-				// es handelt sich um den TestsuitExecuter --> hier soll alles
-				// ignoriert werden
-				return;
-			}
 
 			if (methodExecutionLogger.isMethodEntered()) {
-				// diese Konstrukt ist nÃ¶tig da bei einem Methodeneintritt ein
+				// diese Konstrukt ist nötig da bei einem Methodeneintritt ein
 				// MethodentryEvent und Stepevent generiert werden
 				methodExecutionLogger.setMethodEntered(false);
 			} else {
-				addTransition(methodname, methodExecutionLogger.getLastLineNumber(), location.lineNumber());
+				addTransition(method.toString(), methodExecutionLogger.getLastLineNumber(), location.lineNumber());
 				methodExecutionLogger.stepEvent(location.lineNumber());
 			}
 		}
@@ -247,13 +221,7 @@ public class ExecutionMonitor {
 	private void handleMethodExitEvent(MethodExitEvent event) {
 		Method method= event.method();
 		if (!method.isConstructor() && !method.isStaticInitializer()) {
-			// beim TestsuitExecuter wird nix an dem abstrakten Callstack
-			// gemacht
-			if (method.toString().startsWith(executorClassName)) {
-				return;
-			}
-
-			methodExecutionLogger.setMethodEntered(false);// nÃ¶tig, da bei
+			methodExecutionLogger.setMethodEntered(false);// nötig, da bei
 															// Methoden, die nur
 															// einen return
 															// Statement haben
@@ -264,6 +232,9 @@ public class ExecutionMonitor {
 	}
 
 	private void handleMethodEntryEvent(MethodEntryEvent event) throws AbsentInformationException {
+		if(filterEvent(event)){
+			return;
+		}
 		Method method= event.method();
 		if (!method.isConstructor() && !method.isStaticInitializer()) {
 			String methodname = method.toString();
@@ -312,7 +283,8 @@ public class ExecutionMonitor {
 	}
 
 	private void handleExceptionEvent(ExceptionEvent event) {
-		if (!event.location().method().isConstructor() && !event.location().method().isStaticInitializer()) {
+		Method method= event.location().method();
+		if (!method.isConstructor() && !method.isStaticInitializer()) {
 			String catchLocation = event.catchLocation().method().toString();
 			methodExecutionLogger.repairAfterException(catchLocation);// der
 																		// abstrakte
