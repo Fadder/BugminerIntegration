@@ -20,7 +20,6 @@ import java.awt.FlowLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
 
 import java.awt.Component;
@@ -49,7 +48,7 @@ public class Startpanel extends JFrame {
 	ActionListener l;
 	ActionListener l2;
 	JPanel panel1, panel2, panel3;
-	JDialog startSettingDialog= new StartSettingDialog();
+	StartSettingDialog startSettingDialog= new StartSettingDialog();
 
 	public Startpanel() {
 
@@ -131,6 +130,7 @@ public class Startpanel extends JFrame {
 		panel1.add(startButton);
 		l2 = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				startSettingDialog.refreshTestClasses();
 				startSettingDialog.setVisible(true);
 			}
 		};

@@ -5,118 +5,90 @@ package executor.testexecution;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class TestsuitExecuter {
 
-    private Class<?>[] testClasses;
+	private static final JUnitCore jUnitCore = new JUnitCore();
 
-    public TestsuitExecuter(Class<?>[] testClasses) {
-        this.testClasses = testClasses;
-    }
+	// Parameter sind Namen von Klassen (diese müssen vollqualifiziert sein
+	// z.B. "org.execution_monitor.main.zuTestendeKlassen.HalloWeltTest)
+	public static void main(String[] args) {
+		Class<?>[] testClasses = new Class[args.length];
 
+		if (args.length < 1) {
+			throw new IllegalStateException("Man muss mindestens eine Testklasse angeben! --> TestsuitExecuter");
+		}
 
-    //Parameter sind Namen von Klassen (diese müssen vollqualifiziert sein z.B. "org.execution_monitor.main.zuTestendeKlassen.HalloWeltTest)
-    public static void main(String[] args) {
-        Class<?>[] testClasses = new Class[args.length];
+		// Aus den Parametern, die Strings sind, werden '.class'-Files erstellt
+		int i = 0;
+		for (String each : args) {
+			Class<?> testClass = null;
+			try {
+				testClass = Class.forName(each);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				throw new IllegalStateException(
+						"Man muss voll qualifizierten Klassenamen angeben z.B. org.am.Classname");
+			}
 
-        if (args.length < 1) {
-            throw new IllegalStateException("Man muss mindestens eine Testklasse angeben! --> TestsuitExecuter");
-        }
+			testClasses[i] = testClass;
+			i++;
+		}
 
-        //Aus den Parametern, die Strings sind, werden '.class'-Files erstellt
-        int i = 0;
-        for (String each: args) {
-            Class<?> testClass = null;
-            try {
-                testClass = Class.forName(each);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                throw new IllegalStateException("Man muss voll qualifizierten Klassenamen angeben z.B. org.am.Classname");
-            }
+		for (Class<?> testClass : testClasses) {
+			executeTestClassMethodByMethod(testClass);
+		}
+	}
 
-            testClasses[i] = testClass;
-            i++;
-        }
+	// alle Tests werden ausgeführt aber wir können bestimmen was zwischen den
+	// Testausführungen passiert
+	// --> wir verwenden hier 'Markierungsmethoden', diese geben unserem
+	// Debugger 'ExecutionMonitor' Metadaten z.B.
+	// ob ein Test erflogreich war oder nicht
+	private static void executeTestClassMethodByMethod(Class<?> testClass) {
+		List<Method> testMethods = new ArrayList<>();
 
-        TestsuitExecuter testsuitExecuter = new TestsuitExecuter(testClasses);
-       // testsuitExecuter.executeTestClasses();
+		// Alle TestMethoden pro Klasse werden gesammelt
+		for (Method method : testClass.getMethods()) {
+			Annotation[] annotations = method.getAnnotations();
 
-        testsuitExecuter.executeTestClassesMethodByMethod();
-    }
+			for (Annotation annotation : annotations) {
+				if (annotation.toString().contains("@org.junit.Test")) {
+					testMethods.add(method);
+				}
+			}
 
-    //alle Tests werden nacheinander ausgeführt und wir können nicht bestimmen was zwischen den Testausführungen passiert
-    private void executeTestClasses() {
-        Result result = JUnitCore.runClasses(testClasses);
+		}
 
-        for (Failure failure : result.getFailures()) {
-            System.out.println(failure.toString());
-        }
+		// Testmethoden werden ausgeführt
+		for (Method testMethod : testMethods) {
+			Request request = Request.method(testClass, testMethod.getName());
+			Result result = jUnitCore.run(request);
 
-        System.out.println(result.wasSuccessful());
-    }
+			if (result.getFailureCount() >= 1) {
+				// TestCase hat gefailt
 
-    //alle Tests werden ausgeführt aber wir können bestimmen was zwischen den Testausführungen passiert
-    //--> wir verwenden hier 'Markierungsmethoden', diese geben unserem Debugger 'ExecutionMonitor' Metadaten z.B.
-    //ob ein Test erflogreich war oder nicht
-    private void executeTestClassesMethodByMethod() {
-        List<Method> testMethods;
-        Request request;
-        JUnitCore jUnitCore = new JUnitCore();
+				// unserer Debugger kann anhand dieser Methode feststellen, dass
+				// der gerade ausgefuehrte Testfall gefailt ist
+				testfallGefailt();
 
+			} else {
+				// TestCase war erfolgreich
+				testfallErfolgreich();
+			}
+		}
 
-        for (Class<?> testClass : testClasses) {
-            testMethods = new ArrayList<>();
+	}
 
-            //Alle TestMethoden pro Klasse werden gesammelt
-            for (Method method : testClass.getMethods()) {
-                Annotation[] annotations = method.getAnnotations();
+	private static void testfallErfolgreich() {
+	}
 
-                for (Annotation annotation : annotations) {
-
-                    if (annotation.toString().contains("@org.junit.Test")) {
-                        testMethods.add(method);
-                    }
-                }
-
-            }
-
-            //Testmethoden werden ausgeführt
-            for (Method testMethod : testMethods) {
-                request = Request.method(testClass, testMethod.getName());
-                Result result = jUnitCore.run(request);
-
-                if (result.getFailureCount() >= 1) {
-                    //TestCase hat gefailt
-
-
-                    //unserer Debugger kann anhand dieser Methode feststellen, dass der gerade ausgefuehrte Testfall gefailt ist
-                    testfallGefailt();
-
-                } else {
-                    //TestCase war erfolgreich
-
-                    testfallErfolgreich();
-                }
-            }
-
-
-        }
-    }
-
-    private void testfallErfolgreich() {
-
-    }
-
-    private void testfallGefailt() {
-
-    }
-
+	private static void testfallGefailt() {
+	}
 
 }

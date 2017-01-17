@@ -1,59 +1,97 @@
 package plugin.utility;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.MalformedParametersException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 
 public class TestLocator {
-	
 
-	
-	private static List<String> searchFoldersForTests(Set<String> foldersToCheck){
-		List<String> testClasses = new ArrayList<>();
-		
-		for(String folder: foldersToCheck){
-			Path sourceFolder= new File(folder).toPath();
-		try {
-			Files.walk(sourceFolder).filter(file -> file.getFileName().toString().endsWith(".class"))
-			.map(path -> sourceFolder.relativize(path).toString())
-			.filter(x-> !x.contains("$"))
-			.map(path -> path.replace('/', '.')).map(path -> path.replace('\\', '.'))
-			.map(name -> name.substring(0, name.length() - 6)).forEach(x -> testClasses.add(x));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
-		
-
-		return testClasses;
-	}
-	
-
-	public static List<String> findTestClasses(IProject project){
-		
-		IJavaProject javaProject=null;
+	/**
+	 * Findet alle Testklassen für das Projekt
+	 * 
+	 * @param project das Projekt
+	 * @return alle Testklassen mit vollqualifizierten Namen
+	 */
+	public static Collection<String> findTestClasses(IProject project) { 
 		try {
 			if (!project.getDescription().hasNature(JavaCore.NATURE_ID)) {
 				throw new MalformedParametersException();
 			}
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		javaProject=JavaCore.create(project);
-		Set<String> foldersToCheck=BinaryLocator.getBinaryFolders(javaProject);	
-		
-		return searchFoldersForTests(foldersToCheck);
+
+		IJavaProject javaProject = JavaCore.create(project);
+		Set<String> collectedTestClasses = new TreeSet<>();
+
+		try {
+			for (IPackageFragment fragment : javaProject.getPackageFragments()) {
+				if (fragment.getKind() == IPackageFragmentRoot.K_SOURCE) {
+					for (ICompilationUnit unit : fragment.getCompilationUnits()) {
+						if(containsJUnitImport(unit)){
+							String testClass=getTestClass(unit);
+							if(unit!=null){
+								collectedTestClasses.add(testClass);
+							}
+						}
+					}
+				}
+			}
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+
+		return collectedTestClasses;
+	}
+
+	/**
+	 * Prüft, ob der JUnit Test in die Klasse importiert wurde
+	 */
+	private static boolean containsJUnitImport(ICompilationUnit unit) throws JavaModelException {
+		for (IImportDeclaration imp : unit.getImports()) {
+			if (imp.getElementName().equals("org.junit.Test")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Gibt den Namen der Klasse zurück,
+	 * wenn sie einen Test beinhaltet.
+	 * 
+	 * @return vollqualfizierter Namen der Klasse, die einen Test beinhaltet, null wenn kein Test vorhanden
+	 */
+	private static String getTestClass(ICompilationUnit unit)
+			throws JavaModelException {
+
+		for (IType type : unit.getAllTypes()) {
+			for (IMethod method : type.getMethods()) {
+				for (IAnnotation annotation : method.getAnnotations()) {
+
+					String annotationName= annotation.getElementName();
+					if (annotationName.equals("Test")||annotationName.equals("org.junit.Test")){
+						return type.getFullyQualifiedName();
+					}
+
+				}
+			}
+
+		}
+		return null;
 	}
 }

@@ -1,6 +1,8 @@
 package graphBuilder;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+
 import executor.monitoring.Edge;
 
 /**
@@ -12,9 +14,7 @@ public class MethodGraph {
 
     private int methodCalls;
 
-    // private HashSet<Instruction> instructions;
-
-    private HashMap<Integer,Transition> transitions = new HashMap<>();
+   private HashMap<Integer,Transition> transitions = new HashMap<>();
 
     MethodGraph(String methodId){
         this.methodId = methodId;
@@ -46,6 +46,10 @@ public class MethodGraph {
         int pairedHash = hashSourceAndTarget(source, target);
         return transitions.get(pairedHash);
     }
+    
+    public LinkedList<Transition> getListOfTransition(){
+    	return new LinkedList<>(transitions.values());
+    }
 
     void printAllTransitions(){
         for(Transition transition: transitions.values()){
@@ -53,4 +57,14 @@ public class MethodGraph {
             System.out.println(transition.getCount());
         }
     }
+    
+    public String getMethodId() {
+		return methodId;
+	}
+
+	public int getMethodCalls() {
+		return methodCalls;
+	}
+
+	
 }
