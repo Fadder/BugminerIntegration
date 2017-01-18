@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -26,13 +27,13 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.jdt.core.JavaCore;
 
 import executor.monitoring.Edge;
@@ -53,7 +54,7 @@ public class StartSettingDialog extends JDialog {
 	private JList<String> testClassList;
 	private List<IProject> projects;
 	private IProject selectedProject;
-	private Map<IProject, List<String>> testClassCache=new HashMap<>();
+	private Map<IProject, Collection<String>> testClassCache=new HashMap<>();
 
 	/**
 	 * 
@@ -122,22 +123,35 @@ public class StartSettingDialog extends JDialog {
 				System.out.println("Classpath: " + classpath);
 				System.out.println("Test classes: " + testClasses);
 				System.out.println("Scope: " + scope);
+				
+				Job compilingJob = new Job("Compiling project"){
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						try {
+							selectedProject.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+						} catch (CoreException e) {
+							e.printStackTrace();
+						}
+						return Status.OK_STATUS;
+					}
+					
+				};
 
-				Job executionJob = new Job("debugging Testcase") {
+				Job executionJob = new Job("Debugging Testcase") {
 
 					@Override
-					protected IStatus run(IProgressMonitor arg0) {
+					protected IStatus run(IProgressMonitor monitor) {	
 						ExecutionMonitor execMon = new ExecutionMonitor(classpath, edgeStream, scope, testClasses);
-						execMon.startMonitoring(arg0);
+						execMon.startMonitoring(monitor);
 						return Status.OK_STATUS;
 					}
 
 				};
 
-				Job consumerJob = new Job("Testing output") {
+				Job consumerJob = new Job("Processing output") {
 
 					@Override
-					protected IStatus run(IProgressMonitor arg0) {
+					protected IStatus run(IProgressMonitor monitor) {
 						//TestConsumer consumer = new TestConsumer(edgeStream);
 						//consumer.consume(arg0);
 						Controller graphBuilder = new Controller(edgeStream, TestCaseStream);
@@ -148,13 +162,18 @@ public class StartSettingDialog extends JDialog {
 					}
 
 				};
-				JobGroup jobGroup = new JobGroup("Testing", 2, 2);
+				compilingJob.setPriority(Job.INTERACTIVE);
+				compilingJob.setUser(true);
+				compilingJob.schedule();
+				try {
+					compilingJob.join();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				IProgressMonitor progressGroup = Job.getJobManager().createProgressGroup();
-				executionJob.setJobGroup(jobGroup);
-				executionJob.setPriority(Job.LONG);
-				consumerJob.setPriority(Job.LONG);
-				executionJob.setProgressGroup(progressGroup, IProgressMonitor.UNKNOWN);
-				consumerJob.setProgressGroup(progressGroup, IProgressMonitor.UNKNOWN);
+				progressGroup.beginTask("Debugging " +selectedProject.getName(), 100);
+				executionJob.setProgressGroup(progressGroup, 99);
+				consumerJob.setProgressGroup(progressGroup, 1);
 				executionJob.schedule();
 				consumerJob.schedule();
 
@@ -227,7 +246,6 @@ public class StartSettingDialog extends JDialog {
 				return true;
 			}
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
@@ -238,7 +256,7 @@ public class StartSettingDialog extends JDialog {
 		int selection = projectBox.getSelectedIndex();
 		if (selection >= 0) {
 			selectedProject = projects.get(selection);
-			List<String> testClasses=testClassCache.computeIfAbsent(selectedProject,value-> TestLocator.findTestClasses(selectedProject));
+			Collection<String> testClasses=testClassCache.computeIfAbsent(selectedProject,value-> TestLocator.findTestClasses(selectedProject));
 			for (String testClass : testClasses) {
 				testClassListModel.addElement(testClass);
 			}
