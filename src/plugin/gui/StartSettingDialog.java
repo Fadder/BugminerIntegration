@@ -117,7 +117,7 @@ public class StartSettingDialog extends JDialog {
 				String classpath = ClasspathResolver.getClasspath(selectedProject);
 
 				BlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
-				BlockingQueue<TestCase> TestCaseStream = new LinkedBlockingQueue<>(100000);
+				BlockingQueue<TestCase> testCaseStream = new LinkedBlockingQueue<>(100000);
 				String scope = scopeTextField.getText().replace("*", "");
 
 				System.out.println("Classpath: " + classpath);
@@ -154,7 +154,7 @@ public class StartSettingDialog extends JDialog {
 					protected IStatus run(IProgressMonitor monitor) {
 						//TestConsumer consumer = new TestConsumer(edgeStream);
 						//consumer.consume(arg0);
-						Controller graphBuilder = new Controller(edgeStream, TestCaseStream);
+						Controller graphBuilder = new Controller(edgeStream, testCaseStream);
 						graphBuilder.run();
 						// Thread graphBuilderThr = new Thread(graphBuilder);
 						
