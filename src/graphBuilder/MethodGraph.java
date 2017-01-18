@@ -2,6 +2,7 @@ package graphBuilder;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import executor.monitoring.Edge;
 
@@ -47,7 +48,7 @@ public class MethodGraph {
         return transitions.get(pairedHash);
     }
     
-    public LinkedList<Transition> getListOfTransition(){
+    public List<Transition> getListOfTransition(){
     	return new LinkedList<>(transitions.values());
     }
 
