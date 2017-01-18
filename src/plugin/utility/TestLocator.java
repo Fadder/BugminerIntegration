@@ -21,7 +21,7 @@ import org.eclipse.jdt.core.JavaModelException;
 public class TestLocator {
 
 	/**
-	 * Findet alle Testklassen für das Projekt
+	 * Findet alle Testklassen fï¿½r das Projekt
 	 * 
 	 * @param project das Projekt
 	 * @return alle Testklassen mit vollqualifizierten Namen
@@ -59,7 +59,7 @@ public class TestLocator {
 	}
 
 	/**
-	 * Prüft, ob der JUnit Test in die Klasse importiert wurde
+	 * Prï¿½ft, ob der JUnit Test in die Klasse importiert wurde
 	 */
 	private static boolean containsJUnitImport(ICompilationUnit unit) throws JavaModelException {
 		for (IImportDeclaration imp : unit.getImports()) {
@@ -71,7 +71,7 @@ public class TestLocator {
 	}
 
 	/**
-	 * Gibt den Namen der Klasse zurück,
+	 * Gibt den Namen der Klasse zurï¿½ck,
 	 * wenn sie einen Test beinhaltet.
 	 * 
 	 * @return vollqualfizierter Namen der Klasse, die einen Test beinhaltet, null wenn kein Test vorhanden
