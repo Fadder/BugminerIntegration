@@ -137,6 +137,11 @@ public class Startpanel extends JFrame {
 		startButton.addActionListener(l2);
 
 		getContentPane().add(panel1, 0);
+		
+		this.setSize(500, 300);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setVisible(true);
 
 	}
 
