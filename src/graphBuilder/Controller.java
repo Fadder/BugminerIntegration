@@ -35,6 +35,7 @@ public final class Controller implements Runnable{
 	            	currentTestCase.setSuccessful(!currentEdge.isFailure());
 	            	break;
 	            }
+	            currentTestCase.update(currentEdge);
 	        } catch (InterruptedException e) {
 	        	System.out.println("InterruptedException while processing test case.");
 	            e.printStackTrace();
