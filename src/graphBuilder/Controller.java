@@ -1,7 +1,6 @@
 package graphBuilder;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import executor.monitoring.Edge;
 
 /**
@@ -9,8 +8,8 @@ import executor.monitoring.Edge;
  */
 public final class Controller implements Runnable{
 
-	private BlockingQueue<Edge> inputStream = new LinkedBlockingQueue<>();
-	private BlockingQueue<TestCase> outputStream = new LinkedBlockingQueue<>();
+	private BlockingQueue<Edge> inputStream;
+	private BlockingQueue<TestCase> outputStream;
 
     public Controller(BlockingQueue<Edge> inputStream, BlockingQueue<TestCase> outputStream){
     	this.inputStream = inputStream;
