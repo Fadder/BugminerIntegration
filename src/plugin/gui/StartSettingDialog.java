@@ -37,13 +37,17 @@ import org.eclipse.jdt.core.JavaCore;
 
 import executor.monitoring.Edge;
 import executor.monitoring.ExecutionMonitor;
-import executor.monitoring.TestConsumer;
+//import executor.monitoring.TestConsumer; for simple testing concerns
 import graphBuilder.Controller;
 import graphBuilder.TestCase;
 import plugin.utility.ClasspathResolver;
 import plugin.utility.TestLocator;
 
 public class StartSettingDialog extends JDialog {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8893913147091486760L;
 	private JComboBox<String> projectBox;
 	private DefaultListModel<String> testClassListModel = new DefaultListModel<>();
 	private JList<String> testClassList;
