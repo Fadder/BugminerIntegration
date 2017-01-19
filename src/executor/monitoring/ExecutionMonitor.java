@@ -15,29 +15,39 @@ public class ExecutionMonitor {
 
 	private String classpath;
 	private BlockingQueue<Edge> queue;
-	private String projectPackageNameToMonitor;// Whitelist
-	private List<String> testClasses;
+	private String scope;
 	private JVMConnectionCreator jvmConnectionCreator;
 	private MethodExecutionLogger methodExecutionLogger;
+	private EventRequestManager eventRequestManager;
+	
+	private List<String> testClasses;
+	private int currentTestClass= 0;
+	
 	private IProgressMonitor monitor;
-	private int currentTestCase = 0;
 
+	// die test ausführende Klasse und ihre beobachtete Methoden
 	private static final String executorClassName = "executor.testexecution.TestsuitExecuter";
+	private static final String executorSuccessMethod = executorClassName + ".testfallErfolgreich(java.lang.String)";
+	private static final String executorFailureMethod = executorClassName + ".testfallGefailt(java.lang.String)";
+	private static final String executorNewTestMethod = executorClassName
+			+ ".executeTestClassMethodByMethod(java.lang.Class)";
 
-	// Requests, die gefiltert werden sollen
-	private MethodEntryRequest methodEntryRequest;
-
+	
+	private ClassPrepareRequest classPrepareRequest;
 
 	/**
-	 * dafür da, falls die Testklassen als String uebergeben werden Testklassen
-	 * müssen vollqualifiziert sein z.B.
-	 * org.execution_monitor.main.zuTestendeKlassen.HalloWeltTest
+	 * Erstellt einen neuen ExecutionMonitor
+	 * 
+	 * @param testClasses Testklassen die untersucht werden sollen
+	 * @param classpath der kombinierte classpath für alle Testklassen und dem TestSuitExecutor selbst
+	 * @param scope der scope der Untersuchung, also welche Klassen bzw Packete untersucht werden sollen z.b. org.apache.*
+	 * @param queue die queue in die die Ergebnisse ausgegeben werden
 	 */
-	public ExecutionMonitor(String classpath, BlockingQueue<Edge> queue, String projectPackageNameToMonitor,
-			List<String> testClasses) {
+	public ExecutionMonitor(List<String> testClasses,String classpath, String scope, BlockingQueue<Edge> queue
+			) {
 		this.classpath = classpath;
 		this.queue = queue;
-		this.projectPackageNameToMonitor = projectPackageNameToMonitor;
+		this.scope = scope;
 		this.testClasses = testClasses;
 		this.jvmConnectionCreator = new JVMConnectionCreator(executorClassName, this.testClasses, this.classpath);
 
@@ -45,17 +55,18 @@ public class ExecutionMonitor {
 	}
 
 	/**
-	 * startet den ganzen Debugging Prozess
+	 * Startet den Debugging Prozess
+	 * 
+	 * @param monitor Falls Abbruchmoeglichkeit und Fortschrittsberichte erwuenscht sind, sonst null
 	 */
 	public void startMonitoring(IProgressMonitor monitor) {
-		this.monitor = SubMonitor.convert(monitor, testClasses.size());
 		if (monitor != null) {
+			this.monitor = SubMonitor.convert(monitor, testClasses.size());
 			this.monitor.setTaskName("Debugger");
 			this.monitor.subTask("Start-up phase");
 		}
 		VirtualMachine vm = jvmConnectionCreator.launchAndConnectToTestsuitExecuter();
 
-		// TODO Input und Output umleiten, da sonst VM abstürzen kann
 		Process proc = vm.process();
 		new Thread(new IORedirecter(proc.getInputStream(), System.out)).start();
 		new Thread(new IORedirecter(proc.getErrorStream(), System.err)).start();
@@ -71,37 +82,47 @@ public class ExecutionMonitor {
 	 * aufgenommen werden
 	 */
 	private void defineMonitoringRequests(VirtualMachine vm) {
-		EventRequestManager eventRequestManager = vm.eventRequestManager();
-		ThreadReference mainThread=getMainThreadReferenceFrom(vm);
-		methodEntryRequest = eventRequestManager.createMethodEntryRequest();
+		eventRequestManager = vm.eventRequestManager();
+		ThreadReference mainThread = getMainThreadReferenceFrom(vm);
+		MethodEntryRequest methodEntryRequest = eventRequestManager.createMethodEntryRequest();
 		MethodExitRequest methodExitRequest = eventRequestManager.createMethodExitRequest();
 		StepRequest stepRequest = eventRequestManager.createStepRequest(mainThread, StepRequest.STEP_LINE,
 				StepRequest.STEP_INTO);
 		ExceptionRequest exceptionRequest = eventRequestManager.createExceptionRequest(null, true, false);
+		classPrepareRequest = eventRequestManager.createClassPrepareRequest();
 
 		methodEntryRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
 		methodExitRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
 		stepRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
 		exceptionRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
+		classPrepareRequest.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 
+		// Filtert die Testklassen an sich aus
 		for (String testClass : testClasses) {
 			methodEntryRequest.addClassExclusionFilter(testClass);
 			methodExitRequest.addClassExclusionFilter(testClass);
 			stepRequest.addClassExclusionFilter(testClass);
 			exceptionRequest.addClassExclusionFilter(testClass);
 		}
-		methodExitRequest.addClassFilter(projectPackageNameToMonitor+"*");
-		stepRequest.addClassFilter(projectPackageNameToMonitor+"*");
-		exceptionRequest.addClassFilter(projectPackageNameToMonitor+"*");
+		// whitelist ansatz, betrachte nur events in unserem scope
+		methodEntryRequest.addClassFilter(scope);
+		methodExitRequest.addClassFilter(scope);
+		stepRequest.addClassFilter(scope);
+		exceptionRequest.addClassFilter(scope);
 		
+		// der ClassPrepareRequest wird nur verwendet um das erste Laden des TestsuitExecutor zu verarbeiten 
+		classPrepareRequest.addClassFilter(executorClassName);
+
+		// Betrachte nur den mainThread
 		methodEntryRequest.addThreadFilter(mainThread);
 		methodExitRequest.addThreadFilter(mainThread);
 		exceptionRequest.addThreadFilter(mainThread);
-		
+
 		methodEntryRequest.enable();
 		methodExitRequest.enable();
 		stepRequest.enable();
 		exceptionRequest.enable();
+		classPrepareRequest.enable();
 	}
 
 	private void handleEvents(VirtualMachine vm) {
@@ -109,10 +130,10 @@ public class ExecutionMonitor {
 		EventQueue eventQ = vm.eventQueue();
 
 		while (running) {
-			if (monitor!=null&& monitor.isCanceled()) {
+			if (monitor != null && monitor.isCanceled()) {
 				vm.exit(-1);
 				try {
-					queue.put(Edge.LAST_EDGE);
+					queue.put(Edge.createLastEdge());
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -139,7 +160,9 @@ public class ExecutionMonitor {
 			while (eventIterator.hasNext()) {
 				Event event = eventIterator.nextEvent();
 
-				if (event instanceof MethodEntryEvent) {
+				if (event instanceof StepEvent) {
+					handleStepEvent((StepEvent) event);
+				} else if (event instanceof MethodEntryEvent) {
 					try {
 						handleMethodEntryEvent((MethodEntryEvent) event);
 					} catch (AbsentInformationException e) {
@@ -147,10 +170,17 @@ public class ExecutionMonitor {
 					}
 				} else if (event instanceof MethodExitEvent) {
 					handleMethodExitEvent((MethodExitEvent) event);
-				} else if (event instanceof StepEvent) {
-					handleStepEvent((StepEvent) event);
 				} else if (event instanceof ExceptionEvent) {
 					handleExceptionEvent((ExceptionEvent) event);
+				} else if (event instanceof BreakpointEvent) {
+					try {
+						handleBreakpointEvent((BreakpointEvent) event);
+					} catch (IncompatibleThreadStateException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else if (event instanceof ClassPrepareEvent) {
+					handleClassPrepareEvent((ClassPrepareEvent) event);
 				}
 				// vm.resume(); //an dieser Position wird manchmal eine
 				// VMDisconnectedException verursacht
@@ -160,7 +190,7 @@ public class ExecutionMonitor {
 		}
 
 		try {
-			queue.put(Edge.LAST_EDGE);
+			queue.put(Edge.createLastEdge());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,34 +202,65 @@ public class ExecutionMonitor {
 	}
 
 	/**
-	 * True --> Event soll ignoriert werden False --> bei Events aus dem
-	 * Testprojekt und TestsuitExecuter
+	 * Unser TestsuitExecutor wird hier zum ersten mal geladen, wir setzen breakpoints bei den
+	 * meta methoden um deren Aufruf zu registrieren. Dadurch brauchen wir keine MethodEntryEvents
+	 * bei unserer Klasse und können so einen whitelist benutzen.
 	 */
-	private boolean filterEvent(MethodEntryEvent event) {
-		String eventClass = event.location().declaringType().name();
-		if (eventClass.equals(executorClassName) || eventClass.startsWith(projectPackageNameToMonitor)) {
-			return false;
-		}
-		
-		int oldPos = -1;
-		int newPos = eventClass.indexOf('.');
-		while (newPos != -1) {
-			String subString = eventClass.substring(0, newPos + 1);
+	private void handleClassPrepareEvent(ClassPrepareEvent event) {
+		ReferenceType testsuitExecutorClass = event.referenceType();
 
-			if (!projectPackageNameToMonitor.startsWith(subString) && !executorClassName.startsWith(subString)) {
-				methodEntryRequest.disable();		
+		for (Method method : testsuitExecutorClass.allMethods()) {
+			String methodName = method.toString();
+			if (methodName.equals(executorSuccessMethod) || methodName.equals(executorFailureMethod)
+					|| methodName.equals(executorNewTestMethod)) {
+				try {
+					List<Location> lines = method.allLineLocations();
+					// setze breakpoint bei der ersten ausführbaren linie
+					BreakpointRequest breakpointRequest = eventRequestManager.createBreakpointRequest(lines.get(0));
+					breakpointRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
+					breakpointRequest.enable();
+				} catch (AbsentInformationException e) {
+					e.printStackTrace();
+				}
 
-				String newFilter = subString + "*";
-				methodEntryRequest.addClassExclusionFilter(newFilter);
-
-				methodEntryRequest.enable();
-				return true;
 			}
-			oldPos = newPos;
-			newPos = eventClass.indexOf('.', oldPos + 1);
+		}
+		classPrepareRequest.disable();
+	}
+
+	/**
+	 * Das sind die pseudo MethodEntryEvents für unsere TestsuitExecutor klasse für die meta methoden
+	 */
+	private void handleBreakpointEvent(BreakpointEvent event) throws IncompatibleThreadStateException {
+		Method method = event.location().method();
+		String methodName = method.toString();
+		
+		
+		if (methodName.equals(executorNewTestMethod)) {
+			// Signalisierung das eine neue Testklasse bearbeitet wird 
+			if (monitor == null) {
+				return;
+			}
+			if (currentTestClass != 0) {
+				monitor.worked(1);
+			}
+			monitor.subTask(
+					testClasses.get(currentTestClass++) + " (" + currentTestClass + "/" + testClasses.size() + ")");
+			return;
 		}
 
-		return true;
+		// Testcase ist erledigt, argument ist der name der testcase methode
+		String testcase = ((StringReference) event.thread().frame(0).getArgumentValues().get(0)).value();
+		try {
+			if (methodName.equals(executorSuccessMethod)) {
+				queue.put(Edge.createSuccessfulTestcaseEdge(testcase));
+			} else {
+				queue.put(Edge.createfailedTestcaseEdge(testcase));
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void handleStepEvent(StepEvent event) {
@@ -212,14 +273,14 @@ public class ExecutionMonitor {
 				// MethodentryEvent und Stepevent generiert werden
 				methodExecutionLogger.setMethodEntered(false);
 			} else {
-				addTransition(method.toString(), methodExecutionLogger.getLastLineNumber(), location.lineNumber());
+				queue.add(Edge.createStepEdge(method.toString(),methodExecutionLogger.getLastLineNumber(),location.lineNumber()));
 				methodExecutionLogger.stepEvent(location.lineNumber());
 			}
 		}
 	}
 
 	private void handleMethodExitEvent(MethodExitEvent event) {
-		Method method= event.method();
+		Method method = event.method();
 		if (!method.isConstructor() && !method.isStaticInitializer()) {
 			methodExecutionLogger.setMethodEntered(false);// nötig, da bei
 															// Methoden, die nur
@@ -232,58 +293,21 @@ public class ExecutionMonitor {
 	}
 
 	private void handleMethodEntryEvent(MethodEntryEvent event) throws AbsentInformationException {
-		if(filterEvent(event)){
-			return;
-		}
-		Method method= event.method();
+		Method method = event.method();
 		if (!method.isConstructor() && !method.isStaticInitializer()) {
 			String methodname = method.toString();
-			// --------------TestsuitExecuterMethoden-------
-			if (methodname.startsWith(executorClassName)) {
-				// es handelt sich um den TestsuitExecuter
-				// an dem abstrakten Callstack wird nix gemacht!!
-
-				// wurde gerade eine MetaMethode aufgerufen?
-				try {
-					switch (methodname) {
-					case executorClassName + ".testfallErfolgreich()":
-						queue.put(Edge.TESTCASE_SUCCESS);
-						break;
-					case executorClassName + ".testfallGefailt()":
-						queue.put(Edge.TESTCASE_FAILURE);
-						break;
-					case executorClassName + ".executeTestClassMethodByMethod(java.lang.Class)":
-						if (monitor == null) {
-							break;
-						}
-						if (currentTestCase != 0) {
-							monitor.worked(1);
-						}
-						monitor.subTask(testClasses.get(currentTestCase++) + " (" + currentTestCase + "/"
-								+ testClasses.size() + ")");
-						break;
-					default:
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				return;
-
-			}
-			// ---------------------------------------------
-
-			// ab hier Events aus dem Testprojekt
+	
 			methodExecutionLogger.setMethodEntered(true);
 
 			int lineNumber = event.location().lineNumber();
-			addTransitionMethodEntered(methodname, lineNumber, methodExecutionLogger.getLastMethodname());
+			queue.add(Edge.createMethodEntryEdge(method.toString(), methodExecutionLogger.getLastMethodname(), lineNumber));
 
 			methodExecutionLogger.enterNewMethod(methodname, lineNumber);
 		}
 	}
 
 	private void handleExceptionEvent(ExceptionEvent event) {
-		Method method= event.location().method();
+		Method method = event.location().method();
 		if (!method.isConstructor() && !method.isStaticInitializer()) {
 			String catchLocation = event.catchLocation().method().toString();
 			methodExecutionLogger.repairAfterException(catchLocation);// der
@@ -314,19 +338,6 @@ public class ExecutionMonitor {
 			return mainThreadInVM;
 		}
 
-	}
-
-	private void addTransitionMethodEntered(String fullyQualifiedMethodname, int lineTo, String enteredFromMethod) {
-		// addTransition(fullyQualifiedMethodname, -1, lineTo);
-		Edge transition = new Edge(fullyQualifiedMethodname, -1, lineTo, enteredFromMethod);
-
-		queue.add(transition);
-	}
-
-	private void addTransition(String fullyQualifiedMethodname, int lineFrom, int lineTo) {
-		Edge transition = new Edge(fullyQualifiedMethodname, lineFrom, lineTo);
-
-		queue.add(transition);
 	}
 
 }

@@ -95,7 +95,7 @@ public class StartSettingDialog extends JDialog {
 		// ========== Scope TextField ==========
 
 		JTextField scopeTextField = new JTextField();
-		scopeTextField.setText("(e.g. org.apache.commons.lang3. )");
+		scopeTextField.setText("(e.g. org.apache.commons.lang3.* )");
 
 		// ========== Start Button ==========
 
@@ -118,7 +118,7 @@ public class StartSettingDialog extends JDialog {
 
 				BlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
 				BlockingQueue<TestCase> TestCaseStream = new LinkedBlockingQueue<>(100000);
-				String scope = scopeTextField.getText().replace("*", "");
+				String scope = scopeTextField.getText();
 
 				System.out.println("Classpath: " + classpath);
 				System.out.println("Test classes: " + testClasses);
@@ -141,7 +141,7 @@ public class StartSettingDialog extends JDialog {
 
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {	
-						ExecutionMonitor execMon = new ExecutionMonitor(classpath, edgeStream, scope, testClasses);
+						ExecutionMonitor execMon = new ExecutionMonitor(testClasses,classpath, scope,edgeStream);
 						execMon.startMonitoring(monitor);
 						return Status.OK_STATUS;
 					}

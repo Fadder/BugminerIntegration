@@ -31,9 +31,9 @@ public class TestConsumer {
 				
 				if(transition.isTestCaseFinished()){
 					if(transition.isFailure()){
-						System.out.println("Test failed");
+						System.out.println("Testcase: "+transition.getTestcase()+ " failed");
 					}else{
-						System.out.println("Test success");
+						System.out.println("Testcase: "+transition.getTestcase()+ " succeeded");
 					}
 					continue;
 				}
