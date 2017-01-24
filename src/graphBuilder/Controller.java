@@ -44,7 +44,7 @@ public final class Controller implements Runnable{
     	}
     	try {
 			outputStream.put(currentTestCase);
-			/*
+			
 			Collection<MethodGraph> collectmg = currentTestCase.getMethodGraphs().values();
 			for (MethodGraph mg : collectmg) {
 				Collection<Transition> collectT = mg.getListOfTransition();
@@ -54,7 +54,8 @@ public final class Controller implements Runnable{
 					int c = t.getCount();
 					System.out.println("Transition gave the edge: "+a+"->"+b+", "+c+" times.");
 				}
-			} // This part is needed for the debugging. */
+			System.out.println("TestCase sent.");
+			} // This part is needed for the debugging. 
 		} catch (InterruptedException e) {
 			System.out.println("InterruptedException while putting test case.");
             e.printStackTrace();
