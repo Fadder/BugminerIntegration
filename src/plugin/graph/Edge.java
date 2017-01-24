@@ -17,9 +17,19 @@ public class Edge {
 		this.num = 1; // at first we ran this edge only once
 		this.next = null;
 	}
+	
+	public Edge(int n, int count) {
+		this.id = n;
+		this.num = count;
+		this.next = null;
+	}
 
 	public void incNum() {
 		num++;
+	}
+	
+	public void incNum(int count) {
+		num += count;
 	}
 
 	public int getID() {

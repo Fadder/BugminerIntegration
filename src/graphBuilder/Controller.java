@@ -1,5 +1,6 @@
 package graphBuilder;
 
+import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import executor.monitoring.Edge;
@@ -43,6 +44,17 @@ public final class Controller implements Runnable{
     	}
     	try {
 			outputStream.put(currentTestCase);
+			/*
+			Collection<MethodGraph> collectmg = currentTestCase.getMethodGraphs().values();
+			for (MethodGraph mg : collectmg) {
+				Collection<Transition> collectT = mg.getListOfTransition();
+				for (Transition t: collectT) {
+					int a = t.getSource();
+					int b = t.getTarget();
+					int c = t.getCount();
+					System.out.println("Transition gave the edge: "+a+"->"+b+", "+c+" times.");
+				}
+			} // This part is needed for the debugging. */
 		} catch (InterruptedException e) {
 			System.out.println("InterruptedException while putting test case.");
             e.printStackTrace();

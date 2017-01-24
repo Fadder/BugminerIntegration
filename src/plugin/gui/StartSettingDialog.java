@@ -41,6 +41,7 @@ import executor.monitoring.ExecutionMonitor;
 //import executor.monitoring.TestConsumer; for simple testing concerns
 import graphBuilder.Controller;
 import graphBuilder.TestCase;
+import plugin.graph.GraphDrawer;
 import plugin.utility.ClasspathResolver;
 import plugin.utility.TestLocator;
 
@@ -158,10 +159,31 @@ public class StartSettingDialog extends JDialog {
 						graphBuilder.run();
 						// Thread graphBuilderThr = new Thread(graphBuilder);
 						
+						/*
+						// Create Graph (plugin) from the TestCaseStream
+						GraphDrawer gd = new GraphDrawer(TestCaseStream);
+						gd.run();*/
+						
 						return Status.OK_STATUS;
 					}
 
 				};
+				
+				
+				Job drawerJob = new Job("Putting graph to screen") {
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						
+						// Create Graph (plugin) from the TestCaseStream
+						GraphDrawer gd = new GraphDrawer(TestCaseStream);
+						gd.run();
+						
+						return Status.OK_STATUS;
+					}
+
+				};
+				
 				compilingJob.setPriority(Job.INTERACTIVE);
 				compilingJob.setUser(true);
 				compilingJob.schedule();
@@ -176,7 +198,8 @@ public class StartSettingDialog extends JDialog {
 				consumerJob.setProgressGroup(progressGroup, 1);
 				executionJob.schedule();
 				consumerJob.schedule();
-
+				drawerJob.schedule();
+				
 				// graphBuilderThr.start();
 				setVisible(false);
 			}

@@ -73,6 +73,7 @@ public class Startpanel extends JFrame {
 		ActionListener listenerSelectOutputType = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Fileformat set to: " + e.getActionCommand());
+				//TODO: change output format
 			}
 		};
 
@@ -81,12 +82,12 @@ public class Startpanel extends JFrame {
 		JRadioButton pdf = new JRadioButton("pdf");
 		pdf.setMnemonic(KeyEvent.VK_B);
 		pdf.setActionCommand("pdf");
-		pdf.setSelected(true);
+		pdf.setSelected(false);
 
 		JRadioButton png = new JRadioButton("png");
 		png.setMnemonic(KeyEvent.VK_B);
 		png.setActionCommand("png");
-		png.setSelected(false);
+		png.setSelected(true);
 
 		JRadioButton ps = new JRadioButton("ps");
 		ps.setMnemonic(KeyEvent.VK_B);
@@ -114,6 +115,7 @@ public class Startpanel extends JFrame {
 		// lblNewLabel = new JLabel("New label");
 		// getContentPane().add(lblNewLabel);
 
+		/* // This choose panel is not needed, so commented out, for now. 
 		btnChooseFile = new JButton("Choose file");
 
 		panel1.add(btnChooseFile);
@@ -123,7 +125,7 @@ public class Startpanel extends JFrame {
 			}
 		};
 
-		btnChooseFile.addActionListener(l);
+		btnChooseFile.addActionListener(l);*/
 
 		startButton = new JButton("START");
 
@@ -149,7 +151,7 @@ public class Startpanel extends JFrame {
 	 * @param args
 	 */
 	/*
-	 * public static void main(String[] args) { // TODO Auto-generated method
+	 * public static void main(String[] args) {
 	 * stub createAndStartPanel(); }
 	 */
 

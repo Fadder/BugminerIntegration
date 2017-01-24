@@ -1,5 +1,6 @@
 package graphBuilder;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import executor.monitoring.Edge;
@@ -32,6 +33,14 @@ public class TestCase {
 
 	public void setSuccessful(boolean isSuccessful) {
 		this.isSuccessful = isSuccessful;
+	}
+	
+	public HashMap<String,MethodGraph> getMethodGraphs() {
+		return methodGraphs;
+	}
+	
+	public Collection<MethodGraph> getCollectionMethodGraphs() {
+		return methodGraphs.values();
 	}
 		
 }

@@ -25,15 +25,15 @@ public class Transition {
         return ((sum)*(sum + 1)/2) + target;
     }
 
-    int getSource() {
+    public int getSource() {
         return source;
     }
 
-    int getTarget(){
+    public int getTarget(){
         return target;
     }
 
-    int getCount() {
+    public int getCount() {
         return count;
     }
 }

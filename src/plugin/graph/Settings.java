@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
 
+
 public class Settings {
 	// outputfile typ, eg png, pdf, ps
 	// png is displayed with eclips, pdf and ps with external viewer
@@ -64,6 +65,8 @@ public class Settings {
 		setPath(pathMihaly);
 		setPicturePath(picturePathJan);
 		setPicturePath(picturePathMihaly);
+		
+		final String dir = System.getProperty("user.dir");
 
 		// outputfile typ, eg png, pdf, ps
 		// png is displayed with eclips, pdf and ps with external viewer
@@ -81,7 +84,7 @@ public class Settings {
 		}
 
 		Graph g = new Graph();
-		g.addEdge(5, 1);
+		g.addEdge(5, 1, 1);
 
 		/*
 		 * for (int i = 0; i < 1000; i++) { //Extrem case. g.addEdge(i, (i+1));
