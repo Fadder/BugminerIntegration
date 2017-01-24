@@ -25,8 +25,9 @@ public class Graph {
 	
 	private String filename = "graph"; // name of your output files, default is graph
 	private String type = "png"; // Type of the picture file eg  png, pdf. Default is png.
-	private String path = System.getProperty("user.dir"); // A general path to the working directory.
-
+	private String path = ""; /*System.getProperty("user.dir");*/ // A general path to the working directory.
+	
+	
 	public Graph() {
 		this.firstinst = null;
 	}
@@ -102,6 +103,7 @@ public class Graph {
 	}
 
 	// Creates a dot file from the graph and saves it.
+	// It replaces the old file if this dot file already exists.
 	// Return the path of the saved file as String.
 	public String saveAsDot() {
 
@@ -141,7 +143,7 @@ public class Graph {
 			writer.write(gv.getDotSource());
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("Error during creation of dot file.");
+			System.out.println("Error during creation of dot file: ");
 			e.printStackTrace();
 		}
 		return path + filename + ".dot";
@@ -156,11 +158,13 @@ public class Graph {
 			return;
 		}
 
+		System.out.println("Picture file read in. Path is: " + sourcePath);
 		File out = new File(sourcePath);
 		BufferedImage img = null;
 		try {
 			img = ImageIO.read(out);
 		} catch (IOException e) {
+			System.out.println("Couldn't read input picture file.");
 			e.printStackTrace();
 		}
 
@@ -214,15 +218,17 @@ public class Graph {
 
 	}
 
-	// Creates a BufferedImage from a given dot file.
+	// Creates picture file from the dot file.
+	// Returns the path of the picture as a String.
 	// @param input String representation of the path of the file.
 	// If the parameter is null, reads the default input.
 	public String dotToImage(String input) {
 
 		// Make a new Graph and create it from the input.
 		GraphViz gv = new GraphViz();
-		if (input == null)
+		if (input == null)	{
 			input = path + filename + ".dot";
+		}
 		gv.readSource(input);
 
 		// Write graph to picture file.

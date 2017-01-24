@@ -22,9 +22,16 @@ public class GraphDrawer implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		//if (DEBUG) System.out.println("GraphDrawer started.                                     <- !");
+		
+		/*// Both of these give the path to eclipse but not to the project's working directory.
 		if (DEBUG) System.out.println("Path of image: "+graph.getPath());
-		// The while cycle will be executed once for each incoming TestCase.
+		System.out.println(new java.io.File("").getAbsolutePath());*/
+		
+		/*
+		File f = new File("simple.dot");
+		System.out.println("The absolute path is: "+f.getAbsolutePath()+"\nThe relative path is: "+f.getPath());*/
+		//graph.setPath("");
+		
 		while (true) { // Maybe some break condition?
 			try {
 				TestCase tc = inputStream.take();
@@ -39,6 +46,7 @@ public class GraphDrawer implements Runnable {
 				e.printStackTrace();
 			}
 			if (DEBUG) System.out.println("Drawing finished.");
+			
 			//New TestCase, new Graph
 			resetGraph();
 		}
