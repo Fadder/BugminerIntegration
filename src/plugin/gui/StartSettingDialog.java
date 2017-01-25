@@ -177,7 +177,7 @@ public class StartSettingDialog extends JDialog {
 					protected IStatus run(IProgressMonitor monitor) {
 						
 						// Create Graph (plugin) from the TestCaseStream
-						GraphDrawer gd = new GraphDrawer(TestCaseStream);
+						GraphDrawer gd = new GraphDrawer(TestCaseStream,selectedProject,monitor);
 						gd.run();
 						
 						return Status.OK_STATUS;
