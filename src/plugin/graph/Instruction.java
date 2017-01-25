@@ -1,11 +1,17 @@
 package plugin.graph;
 
 
-/*
+/**
  * The class Instruction is actually a linked list of the nodes of the Graph.
  * Each Instruction has a pointer to the next Instruction (with the next id).
  * This way the Instructions are sorted, which makes organization much easier. 
  * The Instruction however not necessarily has an edge to the "next" Instruction.
+ * 
+ * @param id
+ * @param next
+ * @param edges
+ * @param type
+ * @param error
  */
 public class Instruction {
 
@@ -16,8 +22,10 @@ public class Instruction {
 	private String type;
 	private String error;
 
-	// By initializing a new Instruction we already received an edge
-	// that leads from it to an other one.
+	/** 
+	 * By initializing a new Instruction we already received an edge 
+	 * that leads from it to an other one.
+	 */
 	public Instruction(int from, int to, int count) {
 		this.id = from;
 		this.next = null;
@@ -62,7 +70,11 @@ public class Instruction {
 		}
 	}
 
-	// Returns the searched Edge or null, if it doesn't exist.
+	/**
+	 * searches the graph for a given edge 
+	 * @param id the edge you are searching for
+	 * @return Returns the searched Edge or null, if it doesn't exist.
+	 */
 	public Edge searchEdge(int id) {
 		if (edges == null)
 			return null;

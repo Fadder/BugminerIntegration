@@ -4,10 +4,17 @@ import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
 
-
+/**
+ * central class to manage the different settings
+ * 
+ * @param  type  the output filetype of the graph image eg png, pdf, ps (png is displayed with eclipse, pdf and ps with external viewer)
+ * @param  filename the name of the output image file 
+ * @param  workPath the working directory
+ * @param picturePath the path to store the output image file
+ *
+ */
 public class Settings {
-	// outputfile typ, eg png, pdf, ps
-	// png is displayed with eclips, pdf and ps with external viewer
+	
 	private static String type;
 
 	public static String getType() {
@@ -55,7 +62,7 @@ public class Settings {
 	private static final String picturePathMihaly = pathMihaly + filename + "."
 			+ type;
 
-	/*
+	/**
 	 * main for testing, set your path, set your filename, set your export type,
 	 * then a graph is drawn
 	 */
@@ -86,24 +93,12 @@ public class Settings {
 		Graph g = new Graph();
 		g.addEdge(5, 1, 1);
 
-		/*
-		 * for (int i = 0; i < 1000; i++) { //Extrem case. g.addEdge(i, (i+1));
-		 * }
-		 */
-		/*
-		 * int n = 50; for (int i = 0; i < n; i++) { int a = (int)
-		 * (Math.random()*n); int b = (int) (Math.random()*n); g.addEdge(a, b);
-		 * }
-		 */
-		/*
-		 * for (int i = 0; i < 10; i++) { for (int j = i; j < 10; j++) {
-		 * g.addEdge(i, j); } }
-		 */
 		g.pictureToScreen(g.dotToImage(g.saveAsDot()));
 	}
 
-	// A function to test the new Threads, so that we don't spam the main
-	// function.
+	/** 
+	 * A function to test the new Threads, so that we don't spam the main function.
+	 */
 	private static void testThreads() {
 		Graph g = new Graph();
 
