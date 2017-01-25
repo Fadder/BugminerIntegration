@@ -121,7 +121,7 @@ public class StartSettingDialog extends JDialog {
 				BlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
 
 				BlockingQueue<TestCase> testCaseStream = new LinkedBlockingQueue<>(100000);
-				String scope = scopeTextField.getText().replace("*", "");
+				String scope = scopeTextField.getText();
 
 				System.out.println("Classpath: " + classpath);
 				System.out.println("Test classes: " + testClasses);
