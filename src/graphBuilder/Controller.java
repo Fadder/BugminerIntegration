@@ -33,6 +33,7 @@ public final class Controller implements Runnable{
 	            }
 	            if(currentEdge.isTestCaseFinished()){
 	            	currentTestCase.setSuccessful(!currentEdge.isFailure());
+	            	currentTestCase.setId(currentEdge.getTestcase());
 	            	break;
 	            }
 	            currentTestCase.update(currentEdge);
