@@ -1,10 +1,12 @@
 package plugin.graph;
 
-/*
- * An Edge object contains a number, which identificates the node (vertex) 
- * 	to which the edge leads, 
- * 	a number of how many times this edge [...],
- * 	and a pointer of the next Edge object.
+/**
+ * An Edge object contains a number, which identifies the node (vertex) 
+ * 	to which the edge leads.  
+ * 
+ * @param id identification of the node corresponds to the line number of the handled instruction
+ * @param num stores how many times an edge has been run
+ * @param next pointer of the next Edge object
  */
 public class Edge {
 
@@ -44,7 +46,10 @@ public class Edge {
 		return this.num;
 	}
 
-	// Insert a new Edge after this Edge
+	/** Inserts a new Edge after this Edge
+	 * 
+	 * @param newEdge
+	 */
 	public void setNext(Edge newEdge) {
 		Edge temp = this.next;
 		this.next = newEdge;
