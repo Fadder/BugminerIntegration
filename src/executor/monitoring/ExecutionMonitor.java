@@ -19,10 +19,10 @@ public class ExecutionMonitor {
 	private JVMConnectionCreator jvmConnectionCreator;
 	private MethodExecutionLogger methodExecutionLogger;
 	private EventRequestManager eventRequestManager;
-	
+
 	private List<String> testClasses;
-	private int currentTestClass= 0;
-	
+	private int currentTestClass = 0;
+
 	private IProgressMonitor monitor;
 
 	// die test ausführende Klasse und ihre beobachtete Methoden
@@ -32,19 +32,23 @@ public class ExecutionMonitor {
 	private static final String executorNewTestMethod = executorClassName
 			+ ".executeTestClassMethodByMethod(java.lang.Class)";
 
-	
 	private ClassPrepareRequest classPrepareRequest;
 
 	/**
 	 * Erstellt einen neuen ExecutionMonitor
 	 * 
-	 * @param testClasses Testklassen die untersucht werden sollen
-	 * @param classpath der kombinierte classpath für alle Testklassen und dem TestSuitExecutor selbst
-	 * @param scope der scope der Untersuchung, also welche Klassen bzw Packete untersucht werden sollen z.b. org.apache.*
-	 * @param queue die queue in die die Ergebnisse ausgegeben werden
+	 * @param testClasses
+	 *            Testklassen die untersucht werden sollen
+	 * @param classpath
+	 *            der kombinierte classpath für alle Testklassen und dem
+	 *            TestSuitExecutor selbst
+	 * @param scope
+	 *            der scope der Untersuchung, also welche Klassen bzw Packete
+	 *            untersucht werden sollen z.b. org.apache.*
+	 * @param queue
+	 *            die queue in die die Ergebnisse ausgegeben werden
 	 */
-	public ExecutionMonitor(List<String> testClasses,String classpath, String scope, BlockingQueue<Edge> queue
-			) {
+	public ExecutionMonitor(List<String> testClasses, String classpath, String scope, BlockingQueue<Edge> queue) {
 		this.classpath = classpath;
 		this.queue = queue;
 		this.scope = scope;
@@ -57,7 +61,9 @@ public class ExecutionMonitor {
 	/**
 	 * Startet den Debugging Prozess
 	 * 
-	 * @param monitor Falls Abbruchmoeglichkeit und Fortschrittsberichte erwuenscht sind, sonst null
+	 * @param monitor
+	 *            Falls Abbruchmoeglichkeit und Fortschrittsberichte erwuenscht
+	 *            sind, sonst null
 	 */
 	public void startMonitoring(IProgressMonitor monitor) {
 		if (monitor != null) {
@@ -104,13 +110,15 @@ public class ExecutionMonitor {
 			stepRequest.addClassExclusionFilter(testClass);
 			exceptionRequest.addClassExclusionFilter(testClass);
 		}
-		// whitelist ansatz, betrachte nur events in unserem scope
-		methodEntryRequest.addClassFilter(scope);
-		methodExitRequest.addClassFilter(scope);
-		stepRequest.addClassFilter(scope);
-		exceptionRequest.addClassFilter(scope);
-		
-		// der ClassPrepareRequest wird nur verwendet um das erste Laden des TestsuitExecutor zu verarbeiten 
+		if (scope != null && !scope.isEmpty()) {
+			// whitelist ansatz, betrachte nur events in unserem scope
+			methodEntryRequest.addClassFilter(scope);
+			methodExitRequest.addClassFilter(scope);
+			stepRequest.addClassFilter(scope);
+			exceptionRequest.addClassFilter(scope);
+		}
+		// der ClassPrepareRequest wird nur verwendet um das erste Laden des
+		// TestsuitExecutor zu verarbeiten
 		classPrepareRequest.addClassFilter(executorClassName);
 
 		// Betrachte nur den mainThread
@@ -202,9 +210,10 @@ public class ExecutionMonitor {
 	}
 
 	/**
-	 * Unser TestsuitExecutor wird hier zum ersten mal geladen, wir setzen breakpoints bei den
-	 * meta methoden um deren Aufruf zu registrieren. Dadurch brauchen wir keine MethodEntryEvents
-	 * bei unserer Klasse und können so einen whitelist benutzen.
+	 * Unser TestsuitExecutor wird hier zum ersten mal geladen, wir setzen
+	 * breakpoints bei den meta methoden um deren Aufruf zu registrieren.
+	 * Dadurch brauchen wir keine MethodEntryEvents bei unserer Klasse und
+	 * können so einen whitelist benutzen.
 	 */
 	private void handleClassPrepareEvent(ClassPrepareEvent event) {
 		ReferenceType testsuitExecutorClass = event.referenceType();
@@ -229,15 +238,15 @@ public class ExecutionMonitor {
 	}
 
 	/**
-	 * Das sind die pseudo MethodEntryEvents für unsere TestsuitExecutor klasse für die meta methoden
+	 * Das sind die pseudo MethodEntryEvents für unsere TestsuitExecutor klasse
+	 * für die meta methoden
 	 */
 	private void handleBreakpointEvent(BreakpointEvent event) throws IncompatibleThreadStateException {
 		Method method = event.location().method();
 		String methodName = method.toString();
-		
-		
+
 		if (methodName.equals(executorNewTestMethod)) {
-			// Signalisierung das eine neue Testklasse bearbeitet wird 
+			// Signalisierung das eine neue Testklasse bearbeitet wird
 			if (monitor == null) {
 				return;
 			}
@@ -273,7 +282,8 @@ public class ExecutionMonitor {
 				// MethodentryEvent und Stepevent generiert werden
 				methodExecutionLogger.setMethodEntered(false);
 			} else {
-				queue.add(Edge.createStepEdge(method.toString(),methodExecutionLogger.getLastLineNumber(),location.lineNumber()));
+				queue.add(Edge.createStepEdge(method.toString(), methodExecutionLogger.getLastLineNumber(),
+						location.lineNumber()));
 				methodExecutionLogger.stepEvent(location.lineNumber());
 			}
 		}
@@ -296,11 +306,12 @@ public class ExecutionMonitor {
 		Method method = event.method();
 		if (!method.isConstructor() && !method.isStaticInitializer()) {
 			String methodname = method.toString();
-	
+
 			methodExecutionLogger.setMethodEntered(true);
 
 			int lineNumber = event.location().lineNumber();
-			queue.add(Edge.createMethodEntryEdge(method.toString(), methodExecutionLogger.getLastMethodname(), lineNumber));
+			queue.add(Edge.createMethodEntryEdge(method.toString(), methodExecutionLogger.getLastMethodname(),
+					lineNumber));
 
 			methodExecutionLogger.enterNewMethod(methodname, lineNumber);
 		}
