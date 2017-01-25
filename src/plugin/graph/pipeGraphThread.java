@@ -54,7 +54,7 @@ public class pipeGraphThread extends Thread {
 					break;
 				case 59:
 					// ; marks the end of
-					g.addEdge(from, to);
+					g.addEdge(from, to, 1);
 					firstNode = true;
 					from = 0;
 					to = 0;

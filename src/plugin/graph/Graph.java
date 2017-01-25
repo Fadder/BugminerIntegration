@@ -23,39 +23,35 @@ public class Graph {
 	public Instruction firstinst;
 
 	
-	private String filename = Settings.getFilename(); // name of your output
-														// files
-	private String type = Settings.getType(); // Type of the picture file eg
-												// png, pdf.
-	private String path = Settings.getPath(); // A general path to the working
-												// directory.
+	private String filename = "graph"; // name of your output files, default is graph
+	private String type = "png"; // Type of the picture file eg  png, pdf. Default is png.
+	private String path = ""; /*System.getProperty("user.dir");*/ // A general path to the working directory.
+	
 	
 	public Graph() {
 		this.firstinst = null;
 	}
 
-	// Simply add a new edge to the graph.
+	// Simply add a new edge to the graph or updates the counter.
 	// If the graph doesn't have the necessary nodes yet, they are created.
-	public void addEdge(int from, int to) {
+	public void addEdge(int from, int to, int count) {
 		boolean debugprint = false;
 		if (firstinst == null) { // There are no nodes yet.
 			if (debugprint)
 				System.out.println("Adding new edge " + to
 						+ " to new graph's new instr " + from);
-			firstinst = new Instruction(from, to);
+			firstinst = new Instruction(from, to, count);
 		} else {
 			Instruction instr = searchInstr(from);
 			if (instr == null) { // This node doesn't yet exist.
 				if (debugprint)
 					System.out.println("Adding new edge " + to
 							+ " to new instr " + from);
-				addInstr(from, to);
+				addInstr(from, to, count);
 				return;
 			} else { // The node exists, add edge to it.
-				if (debugprint)
-					System.out.println("Adding new edge " + to + " to instr "
-							+ from);
-				instr.addEdge(to);
+				if (debugprint) System.out.println("Adding new edge " + to + " to instr " + from);
+				instr.addEdge(to, count);
 			}
 		}
 	}
@@ -85,8 +81,8 @@ public class Graph {
 	 * 
 	 * @param to The id of the instruction to which the edge leads.
 	 */
-	public Instruction addInstr(int id, int to) {
-		Instruction instr = new Instruction(id, to);
+	public Instruction addInstr(int id, int to, int count) {
+		Instruction instr = new Instruction(id, to, count);
 		if (this.firstinst == null) {
 			firstinst = instr;
 			return firstinst;
@@ -107,6 +103,7 @@ public class Graph {
 	}
 
 	// Creates a dot file from the graph and saves it.
+	// It replaces the old file if this dot file already exists.
 	// Return the path of the saved file as String.
 	public String saveAsDot() {
 
@@ -146,7 +143,7 @@ public class Graph {
 			writer.write(gv.getDotSource());
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("Error during creation of dot file.");
+			System.out.println("Error during creation of dot file: ");
 			e.printStackTrace();
 		}
 		return path + filename + ".dot";
@@ -161,11 +158,13 @@ public class Graph {
 			return;
 		}
 
+		System.out.println("Picture file read in. Path is: " + sourcePath);
 		File out = new File(sourcePath);
 		BufferedImage img = null;
 		try {
 			img = ImageIO.read(out);
 		} catch (IOException e) {
+			System.out.println("Couldn't read input picture file.");
 			e.printStackTrace();
 		}
 
@@ -219,15 +218,17 @@ public class Graph {
 
 	}
 
-	// Creates a BufferedImage from a given dot file.
+	// Creates picture file from the dot file.
+	// Returns the path of the picture as a String.
 	// @param input String representation of the path of the file.
 	// If the parameter is null, reads the default input.
 	public String dotToImage(String input) {
 
 		// Make a new Graph and create it from the input.
 		GraphViz gv = new GraphViz();
-		if (input == null)
+		if (input == null)	{
 			input = path + filename + ".dot";
+		}
 		gv.readSource(input);
 
 		// Write graph to picture file.
@@ -235,6 +236,22 @@ public class Graph {
 		gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type, "dot"), out);
 
 		return path + filename + "." + type;
+	}
+	
+	public void setFilename(String name) {
+		filename = name;
+	}
+	
+	public void setType(String new_type) {
+		type = new_type;
+	}
+	
+	public String getPath() {
+		return path;
+	}
+	
+	public void setPath(String newPath) {
+		path = newPath;
 	}
 
 }

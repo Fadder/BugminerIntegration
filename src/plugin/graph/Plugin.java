@@ -29,7 +29,7 @@ public class Plugin implements IWorkbenchWindowActionDelegate {
 		//Here we will open the GUI for the CFG.
 		new Startpanel();
 		// sp.createAndStartPanel(); redundant
-		
+
 		// System.out.println("Everything's fine."); for simple testing
 	}
 

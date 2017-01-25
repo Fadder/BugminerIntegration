@@ -25,7 +25,6 @@ public class MethodGraph {
     void update(Edge edge){
         if(edge.isFirstLine()){
             methodCalls++;
-            return;
         }
         int pairedHash = hashSourceAndTarget(edge.getLineFrom(), edge.getLineTo());
         Transition transition = transitions.computeIfAbsent(pairedHash, k -> new Transition(edge.getLineFrom(), edge.getLineTo()));

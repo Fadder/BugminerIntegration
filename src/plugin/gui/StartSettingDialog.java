@@ -38,10 +38,12 @@ import org.eclipse.jdt.core.JavaCore;
 
 import executor.monitoring.Edge;
 import executor.monitoring.ExecutionMonitor;
-//import executor.monitoring.TestConsumer; for simple testing concerns
+import executor.monitoring.TestConsumer;
 import graphBuilder.Controller;
 import graphBuilder.TestCase;
+import plugin.graph.GraphDrawer;
 import plugin.utility.ClasspathResolver;
+import plugin.utility.SourceFormatter;
 import plugin.utility.TestLocator;
 
 public class StartSettingDialog extends JDialog {
@@ -54,7 +56,7 @@ public class StartSettingDialog extends JDialog {
 	private JList<String> testClassList;
 	private List<IProject> projects;
 	private IProject selectedProject;
-	private Map<IProject, Collection<String>> testClassCache=new HashMap<>();
+	private Map<IProject, Collection<String>> testClassCache = new HashMap<>();
 
 	/**
 	 * 
@@ -95,7 +97,7 @@ public class StartSettingDialog extends JDialog {
 		// ========== Scope TextField ==========
 
 		JTextField scopeTextField = new JTextField();
-		scopeTextField.setText("(e.g. org.apache.commons.lang3. )");
+		scopeTextField.setText("(e.g. org.apache.commons.lang3.* )");
 
 		// ========== Start Button ==========
 
@@ -117,6 +119,7 @@ public class StartSettingDialog extends JDialog {
 				String classpath = ClasspathResolver.getClasspath(selectedProject);
 
 				BlockingQueue<Edge> edgeStream = new LinkedBlockingQueue<>(100000);
+
 				BlockingQueue<TestCase> testCaseStream = new LinkedBlockingQueue<>(100000);
 				String scope = scopeTextField.getText().replace("*", "");
 
@@ -141,7 +144,7 @@ public class StartSettingDialog extends JDialog {
 
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {	
-						ExecutionMonitor execMon = new ExecutionMonitor(classpath, edgeStream, scope, testClasses);
+						ExecutionMonitor execMon = new ExecutionMonitor(testClasses,classpath, scope,edgeStream);
 						execMon.startMonitoring(monitor);
 						return Status.OK_STATUS;
 					}
@@ -158,10 +161,31 @@ public class StartSettingDialog extends JDialog {
 						graphBuilder.run();
 						// Thread graphBuilderThr = new Thread(graphBuilder);
 						
+						/*
+						// Create Graph (plugin) from the TestCaseStream
+						GraphDrawer gd = new GraphDrawer(TestCaseStream);
+						gd.run();*/
+						
 						return Status.OK_STATUS;
 					}
 
 				};
+				
+				
+				Job drawerJob = new Job("Putting graph to screen") {
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						
+						// Create Graph (plugin) from the TestCaseStream
+						GraphDrawer gd = new GraphDrawer(testCaseStream);
+						gd.run();
+						
+						return Status.OK_STATUS;
+					}
+
+				};
+				
 				compilingJob.setPriority(Job.INTERACTIVE);
 				compilingJob.setUser(true);
 				compilingJob.schedule();
@@ -176,7 +200,8 @@ public class StartSettingDialog extends JDialog {
 				consumerJob.setProgressGroup(progressGroup, 1);
 				executionJob.schedule();
 				consumerJob.schedule();
-
+				drawerJob.schedule();
+				
 				// graphBuilderThr.start();
 				setVisible(false);
 			}
@@ -186,12 +211,50 @@ public class StartSettingDialog extends JDialog {
 		// ========== Cancel Button ==========
 
 		JButton cancelButton = new JButton("Cancel");
-		ActionListener listener3 = new ActionListener() {
+
+		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
 			}
-		};
-		cancelButton.addActionListener(listener3);
+		});
+
+		// ========== Reformat Button ==========
+
+		JButton reformatButton = new JButton("Reformat Code");
+
+		reformatButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (selectedProject == null) {
+					JOptionPane.showMessageDialog(null, "No project selected");
+					return;
+				}
+				int reply = JOptionPane.showConfirmDialog(null, "This will modify all source files in project \""+selectedProject.getName()+"\", are you sure?", "Code Reformatting",
+						JOptionPane.YES_NO_OPTION);
+				if (reply != JOptionPane.YES_OPTION) {
+					return;
+				}
+
+				Job reformattingJob = new Job("Reformatting project") {
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						SourceFormatter.format(selectedProject, monitor);
+						return Status.OK_STATUS;
+					}
+
+				};
+				reformattingJob.setUser(true);
+				reformattingJob.schedule();
+				try {
+					reformattingJob.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 
 		// ========== Layout ==========
 
@@ -206,8 +269,8 @@ public class StartSettingDialog extends JDialog {
 				.addGroup(layout.createParallelGroup(Alignment.TRAILING).addComponent(projectLabel)
 						.addComponent(testClassLabel).addComponent(scopeLabel))
 				.addGroup(layout.createParallelGroup().addComponent(projectBox).addComponent(testClassScrollPane)
-						.addComponent(scopeTextField)
-						.addGroup(layout.createSequentialGroup().addComponent(startButton).addComponent(cancelButton)));
+						.addComponent(scopeTextField).addGroup(layout.createSequentialGroup().addComponent(startButton)
+								.addComponent(reformatButton).addComponent(cancelButton)));
 
 		verticalGroup
 				.addGroup(layout.createParallelGroup().addComponent(projectLabel).addComponent(projectBox, 0,
@@ -215,7 +278,8 @@ public class StartSettingDialog extends JDialog {
 				.addGroup(layout.createParallelGroup().addComponent(testClassLabel).addComponent(testClassScrollPane))
 				.addGroup(layout.createParallelGroup().addComponent(scopeLabel).addComponent(scopeTextField, 0,
 						GroupLayout.DEFAULT_SIZE, 25))
-				.addGroup(layout.createParallelGroup().addComponent(startButton).addComponent(cancelButton));
+				.addGroup(layout.createParallelGroup().addComponent(startButton).addComponent(reformatButton)
+						.addComponent(cancelButton));
 
 		layout.setVerticalGroup(verticalGroup);
 		layout.setHorizontalGroup(horizontalGroup);

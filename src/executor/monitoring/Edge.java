@@ -1,5 +1,5 @@
 package executor.monitoring;
-
+import java.util.Objects;
 
 // the edges are handed over in a java.util.concurrent.BlockingQueue<Edge>
 // someone creates a queue and gives it to the graph builder and executor
@@ -8,44 +8,80 @@ package executor.monitoring;
 // returned.
 
 public class Edge {
-	public static final Edge LAST_EDGE= new Edge("",-1,-1);
-	public static final Edge TESTCASE_SUCCESS= new Edge("",1 ,-2);
-	public static final Edge TESTCASE_FAILURE= new Edge("",0,-2);
-	// the method this edge is in --> package + classname + methodname
 	private String method;
-
-	// the last line we executed in this method
 	private int lineFrom;
-
-	// the line we reached from the last line
 	private int lineTo;
+	private String enteredFrom;
+	private boolean failure;
+	private String testcase;
 
-	private String enteredFromMethod;
+	private Edge(String method, String enteredFrom, int lineFrom, int lineTo, String testcase, boolean failure) {
+		this.method = Objects.requireNonNull(method);
+		this.lineFrom = lineFrom;
+		this.lineTo = lineTo;
+		this.enteredFrom = enteredFrom;
+		this.failure = failure;
+		this.testcase=testcase;
+	}
 	
-	 public Edge(String method, int lineFrom, int lineTo) {
-	 this.method = method;
-	 this.lineFrom = lineFrom;
-	 this.lineTo = lineTo;
-	 }
+	//TODO: mit den ganzen zugefügten Informationen wirds langsam ziemlich hässlich, vielleicht doch in klassen aufspalten? wäre aber interfaceänderung :/
 	
-	 public Edge(String method, int lineFrom, int lineTo, String
-	 enteredFromMethod) {
-	 this.method = method;
-	 this.lineFrom = lineFrom;
-	 this.lineTo = lineTo;
-	 this.enteredFromMethod = enteredFromMethod;
-	 }
+	static Edge createStepEdge(String method, int lineFrom, int lineTo){
+		return new Edge(method,null,lineFrom,lineTo,null,false);
+	}
+	
+	static Edge createMethodEntryEdge(String method, String enteredFrom, int entryLine){
+		return new Edge(method,enteredFrom,-1,entryLine,null, false);
+	}
+	
+	static Edge createSuccessfulTestcaseEdge(String testcase){
+		return new Edge("",null,-2,-2,testcase, false);
+	}
+	
+	static Edge createfailedTestcaseEdge(String testcase){
+		return new Edge("",null,-2,-2,testcase, true);
+	}
+	
+    static Edge createLastEdge(){
+		return new Edge("",null,-1,-1,null,false);
+	}
+	
+    
+    /**
+     * Gibt den namen des beendeten TestCase zurück.
+     * Nur gültig, wenn isTestCaseFinished true ist
+     * 
+     * @return name der testmethode
+     */
+	public String getTestcase(){
+		return testcase;
+	}
 
+	/**
+	 * Gibt zurück, ob diese Edge die letzte ist.
+	 * Wenn true, sind alle restlichen Werte dieser Kante ungültig
+	 */
 	public boolean isFinished() {
-		return method.equals("") && lineTo == -1;
+		return method.equals("") && lineTo == -1 && lineFrom==-1;
 	}
 
+	/**
+	 * Gibt zurück, ob ein Testcase beendet wurde.
+	 * Wenn true, gibt nur getTestcase() und isFailure()
+	 * ein gültiges Ergebnis zurück
+	 * @return
+	 */
 	public boolean isTestCaseFinished() {
-		return method.equals("") && lineTo == -2;
+		return testcase!=null;
 	}
 
+	/**
+	 * Gibt zurück, ob der Testcase ein Fehlschlag war.
+	 * Nur gültig, wenn isTestCaseFinished() true ergibt.
+	 * @return
+	 */
 	public boolean isFailure() {
-		return this.lineFrom==0;
+		return failure;
 	}
 
 	public boolean isFirstLine() {
@@ -60,11 +96,13 @@ public class Edge {
 		return lineFrom;
 	}
 
+
 	public int getLineTo() {
 		return lineTo;
 	}
 
-	public String getEnteredFromMethod() {
-		return enteredFromMethod;
+	public String getEnteredFrom() {
+		return enteredFrom;
 	}
+
 }

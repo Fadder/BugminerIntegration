@@ -1,5 +1,12 @@
 package plugin.graph;
 
+
+/*
+ * The class Instruction is actually a linked list of the nodes of the Graph.
+ * Each Instruction has a pointer to the next Instruction (with the next id).
+ * This way the Instructions are sorted, which makes organization much easier. 
+ * The Instruction however not necessarily has an edge to the "next" Instruction.
+ */
 public class Instruction {
 
 	private final int id; // ID of the vertex
@@ -11,18 +18,18 @@ public class Instruction {
 
 	// By initializing a new Instruction we already received an edge
 	// that leads from it to an other one.
-	public Instruction(int from, int to) {
+	public Instruction(int from, int to, int count) {
 		this.id = from;
 		this.next = null;
-		this.edges = new Edge(to);
+		this.edges = new Edge(to, count);
 		this.type = "";
 		this.error = "";
 	}
 
-	public void addEdge(int to) {
+	public void addEdge(int to, int count) {
 		// This part should never occur, but who knows.
 		if (edges == null) { // There are no edges yet.
-			edges = new Edge(to);
+			edges = new Edge(to, count);
 			return;
 		}
 
@@ -30,7 +37,7 @@ public class Instruction {
 		if (edge == null) { // Not found. Add new edge.
 			if (edges.getID() > to) { // New edge will be the first.
 				Edge temp = edges;
-				edges = new Edge(to);
+				edges = new Edge(to, count);
 				edges.setNext(temp);
 				return;
 			}
@@ -39,7 +46,7 @@ public class Instruction {
 				if (edge.getNext().getID() > to) {
 					// Now insert a new Edge after the Edge "edge".
 					Edge temp = edge.getNext();
-					Edge newEdge = new Edge(to);
+					Edge newEdge = new Edge(to, count);
 					edge.setNext(newEdge);
 					newEdge.setNext(temp);
 					return;
@@ -47,11 +54,11 @@ public class Instruction {
 				edge = edge.getNext();
 			}
 			// The new edge will be the last one.
-			Edge newEdge = new Edge(to);
+			Edge newEdge = new Edge(to, count);
 			edge.setNext(newEdge);
 
 		} else {
-			edge.incNum();
+			edge.incNum(count);
 		}
 	}
 

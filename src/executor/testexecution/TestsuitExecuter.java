@@ -1,7 +1,5 @@
 package executor.testexecution;
 
-//import org.execution_monitor.main.zuTestendeKlassen.HalloWelt;
-//import org.execution_monitor.main.zuTestendeKlassen.HalloWeltTest;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.junit.runner.Result;
@@ -75,20 +73,22 @@ public class TestsuitExecuter {
 
 				// unserer Debugger kann anhand dieser Methode feststellen, dass
 				// der gerade ausgefuehrte Testfall gefailt ist
-				testfallGefailt();
+				testfallGefailt(testClass.getName()+"."+testMethod.getName()+"()");
 
 			} else {
 				// TestCase war erfolgreich
-				testfallErfolgreich();
+				testfallErfolgreich(testClass.getName()+"."+testMethod.getName()+"()");
 			}
 		}
 
 	}
 
-	private static void testfallErfolgreich() {
+	private static String testfallErfolgreich(String testcase) {
+		return testcase;
 	}
 
-	private static void testfallGefailt() {
+	private static String testfallGefailt(String testcase) {
+		return testcase;
 	}
 
 }
