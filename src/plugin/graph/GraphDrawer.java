@@ -57,8 +57,12 @@ public class GraphDrawer implements Runnable {
 				if (DEBUG) System.out.println("TestCase: "+tc);
 				
 				// Build graph here.
-				testcaseToGraph(tc);
-				graph.pictureToScreen(graph.dotToImage(graph.saveAsDot()));
+				for(MethodGraph methodgraph: tc.getCollectionMethodGraphs()){
+					graph=new Graph();
+					testcaseToGraph(methodgraph);
+					graph.pictureToScreen(graph.dotToImage(graph.saveAsDot()));
+				}
+			
 				if (DEBUG) System.out.println("One graph drawn.");
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -73,19 +77,9 @@ public class GraphDrawer implements Runnable {
 	
 	
 	// Converts the TestCase objects into the plugin's Graph format.
-	private void testcaseToGraph(TestCase tc) {
-		if (tc.getMethodGraphs().isEmpty()){
-			System.out.println("Error! Given MethodGraph is empty.");
-		}
-		if (DEBUG) System.out.println("Testcase to Graph.");
-		//Collection<MethodGraph> collectmg = tc.getMethodGraphs().values();
-		Collection<MethodGraph> collectmg = tc.getCollectionMethodGraphs();
-		if (collectmg.isEmpty()){
-			System.out.println("Error! Given Collection is empty.");
-		}
+	private void testcaseToGraph(MethodGraph mg) {
 		
 		
-		for (MethodGraph mg : collectmg) {
 			if (DEBUG) System.out.println("    A methodgraph.");
 			Collection<Transition> collectT = mg.getListOfTransition();
 			for (Transition t: collectT) {
@@ -97,7 +91,7 @@ public class GraphDrawer implements Runnable {
 				
 				graph.addEdge(a, b, c);
 			}
-		}
+		
 		
 	}
 	
