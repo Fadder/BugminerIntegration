@@ -66,7 +66,7 @@ public class Settings {
 		setPicturePath(picturePathJan);
 		setPicturePath(picturePathMihaly);
 		
-		final String dir = System.getProperty("user.dir");
+		//final String dir = System.getProperty("user.dir");
 
 		// outputfile typ, eg png, pdf, ps
 		// png is displayed with eclips, pdf and ps with external viewer

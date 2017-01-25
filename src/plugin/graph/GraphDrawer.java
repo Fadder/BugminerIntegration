@@ -2,7 +2,6 @@ package plugin.graph;
 
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import graphBuilder.MethodGraph;
 import graphBuilder.TestCase;
@@ -12,7 +11,7 @@ public class GraphDrawer implements Runnable {
 	
 	private final boolean DEBUG = true;
 	private Graph graph; // The own representation of the graph which will be converted into a dot file and then to a picture.
-	private BlockingQueue<TestCase> inputStream = new LinkedBlockingQueue<>(); // The input stream where the full testcases come.
+	private BlockingQueue<TestCase> inputStream; // The input stream where the full testcases come.
 	
 	public GraphDrawer(BlockingQueue<TestCase> inputStream) {
 		graph = new Graph();
@@ -30,6 +29,7 @@ public class GraphDrawer implements Runnable {
 		/*
 		File f = new File("simple.dot");
 		System.out.println("The absolute path is: "+f.getAbsolutePath()+"\nThe relative path is: "+f.getPath());*/
+		
 		//graph.setPath("");
 		
 		while (true) { // Maybe some break condition?
