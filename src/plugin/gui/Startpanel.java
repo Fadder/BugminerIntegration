@@ -26,6 +26,8 @@ import javax.swing.JButton;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 //import java.awt.event.MouseAdapter;
 //import java.awt.event.MouseEvent;
 
@@ -38,6 +40,7 @@ public class Startpanel extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static Startpanel startpanel;
 
 	JMenuBar menuBar;
 	JMenu mnNewMenu;
@@ -50,7 +53,7 @@ public class Startpanel extends JFrame {
 	JPanel panel1, panel2, panel3;
 	StartSettingDialog startSettingDialog= new StartSettingDialog();
 
-	public Startpanel() {
+	private Startpanel() {
 
 		panel1 = new JPanel();
 
@@ -143,7 +146,14 @@ public class Startpanel extends JFrame {
 		this.setSize(500, 300);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setVisible(true);
+		
+		this.addWindowListener(new WindowAdapter(){
+			@Override
+			public void windowClosing(WindowEvent evt){
+				startpanel=null;
+				System.out.println("Startpanel destroyed");
+			}
+		});
 
 	}
 
@@ -155,11 +165,11 @@ public class Startpanel extends JFrame {
 	 * stub createAndStartPanel(); }
 	 */
 
-	public void createAndStartPanel() {
-		Startpanel startpanel = new Startpanel();
-		startpanel.setSize(500, 300);
-		startpanel.setLocationRelativeTo(null);
-		startpanel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	public static void openPanel() {
+		if(startpanel==null){
+			startpanel=new Startpanel();
+			System.out.println("Startpanel generated");
+		}
 		startpanel.setVisible(true);
 
 	}

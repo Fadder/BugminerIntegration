@@ -27,7 +27,7 @@ public class Plugin implements IWorkbenchWindowActionDelegate {
 	 */
 	public void run(IAction action) {
 		//Here we will open the GUI for the CFG.
-		new Startpanel();
+		Startpanel.openPanel();
 		// sp.createAndStartPanel(); redundant
 
 		// System.out.println("Everything's fine."); for simple testing
