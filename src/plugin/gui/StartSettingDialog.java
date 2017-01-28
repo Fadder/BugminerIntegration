@@ -57,6 +57,7 @@ public class StartSettingDialog extends JDialog {
 	private List<IProject> projects;
 	private IProject selectedProject;
 	private Map<IProject, Collection<String>> testClassCache = new HashMap<>();
+	JTextField scopeTextField = new JTextField();;
 
 	/**
 	 * 
@@ -94,11 +95,6 @@ public class StartSettingDialog extends JDialog {
 		testClassList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		JScrollPane testClassScrollPane = new JScrollPane(testClassList);
 
-		// ========== Scope TextField ==========
-
-		JTextField scopeTextField = new JTextField();
-		scopeTextField.setText("(e.g. org.apache.commons.lang3.* )");
-
 		// ========== Start Button ==========
 
 		JButton startButton = new JButton("Start");
@@ -126,8 +122,8 @@ public class StartSettingDialog extends JDialog {
 				System.out.println("Classpath: " + classpath);
 				System.out.println("Test classes: " + testClasses);
 				System.out.println("Scope: " + scope);
-				
-				Job compilingJob = new Job("Compiling project"){
+
+				Job compilingJob = new Job("Compiling project") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						try {
@@ -137,14 +133,14 @@ public class StartSettingDialog extends JDialog {
 						}
 						return Status.OK_STATUS;
 					}
-					
+
 				};
 
 				Job executionJob = new Job("Debugging Testcase") {
 
 					@Override
-					protected IStatus run(IProgressMonitor monitor) {	
-						ExecutionMonitor execMon = new ExecutionMonitor(testClasses,classpath, scope,edgeStream);
+					protected IStatus run(IProgressMonitor monitor) {
+						ExecutionMonitor execMon = new ExecutionMonitor(testClasses, classpath, scope, edgeStream);
 						execMon.startMonitoring(monitor);
 						return Status.OK_STATUS;
 					}
@@ -155,37 +151,37 @@ public class StartSettingDialog extends JDialog {
 
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						//TestConsumer consumer = new TestConsumer(edgeStream);
-						//consumer.consume(arg0);
+						// TestConsumer consumer = new TestConsumer(edgeStream);
+						// consumer.consume(arg0);
 						Controller graphBuilder = new Controller(edgeStream, testCaseStream);
 						graphBuilder.run();
 						// Thread graphBuilderThr = new Thread(graphBuilder);
-						
+
 						/*
-						// Create Graph (plugin) from the TestCaseStream
-						GraphDrawer gd = new GraphDrawer(TestCaseStream);
-						gd.run();*/
-						
+						 * // Create Graph (plugin) from the TestCaseStream
+						 * GraphDrawer gd = new GraphDrawer(TestCaseStream);
+						 * gd.run();
+						 */
+
 						return Status.OK_STATUS;
 					}
 
 				};
-				
-				
+
 				Job drawerJob = new Job("Putting graph to screen") {
 
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						
+
 						// Create Graph (plugin) from the TestCaseStream
-						GraphDrawer gd = new GraphDrawer(testCaseStream,selectedProject,monitor);
+						GraphDrawer gd = new GraphDrawer(testCaseStream, selectedProject, monitor);
 						gd.run();
-						
+
 						return Status.OK_STATUS;
 					}
 
 				};
-				
+
 				compilingJob.setPriority(Job.INTERACTIVE);
 				compilingJob.setUser(true);
 				compilingJob.schedule();
@@ -195,13 +191,13 @@ public class StartSettingDialog extends JDialog {
 					e1.printStackTrace();
 				}
 				IProgressMonitor progressGroup = Job.getJobManager().createProgressGroup();
-				progressGroup.beginTask("Debugging " +selectedProject.getName(), 100);
+				progressGroup.beginTask("Debugging " + selectedProject.getName(), 100);
 				executionJob.setProgressGroup(progressGroup, 99);
 				consumerJob.setProgressGroup(progressGroup, 1);
 				executionJob.schedule();
 				consumerJob.schedule();
 				drawerJob.schedule();
-				
+
 				// graphBuilderThr.start();
 				setVisible(false);
 			}
@@ -230,7 +226,8 @@ public class StartSettingDialog extends JDialog {
 					JOptionPane.showMessageDialog(null, "No project selected");
 					return;
 				}
-				int reply = JOptionPane.showConfirmDialog(null, "This will modify all source files in project \""+selectedProject.getName()+"\", are you sure?", "Code Reformatting",
+				int reply = JOptionPane.showConfirmDialog(null, "This will modify all source files in project \""
+						+ selectedProject.getName() + "\", are you sure?", "Code Reformatting",
 						JOptionPane.YES_NO_OPTION);
 				if (reply != JOptionPane.YES_OPTION) {
 					return;
@@ -286,18 +283,17 @@ public class StartSettingDialog extends JDialog {
 		setSize(400, 300);
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(layout);
-		
-		
-		Job backgroundPreLoading=new Job("Preloading test classes"){
+
+		Job backgroundPreLoading = new Job("Preloading test classes") {
 
 			@Override
 			protected IStatus run(IProgressMonitor arg0) {
-				for(IProject project: projects){
-					testClassCache.computeIfAbsent(project,value-> TestLocator.findTestClasses(project));
+				for (IProject project : projects) {
+					testClassCache.computeIfAbsent(project, value -> TestLocator.findTestClasses(project));
 				}
 				return Status.OK_STATUS;
 			}
-			
+
 		};
 		backgroundPreLoading.setPriority(Job.DECORATE);
 		backgroundPreLoading.schedule();
@@ -320,11 +316,56 @@ public class StartSettingDialog extends JDialog {
 		int selection = projectBox.getSelectedIndex();
 		if (selection >= 0) {
 			selectedProject = projects.get(selection);
-			Collection<String> testClasses=testClassCache.computeIfAbsent(selectedProject,value-> TestLocator.findTestClasses(selectedProject));
+			Collection<String> testClasses = testClassCache.computeIfAbsent(selectedProject,
+					value -> TestLocator.findTestClasses(selectedProject));
 			for (String testClass : testClasses) {
 				testClassListModel.addElement(testClass);
 			}
+			scopeTextField.setText(greatestCommonPackageFragment());
 		}
+	}
+
+	private String greatestCommonPackageFragment() {
+		int size = testClassListModel.size();
+		if (size == 0) {
+			return "";
+		}
+
+		String smallestString = testClassListModel.get(0);
+
+		for (int i = 1; i < size; i++) {
+			String current = testClassListModel.get(i);
+			if (current.length() < smallestString.length()) {
+				smallestString = current;
+			}
+		}
+
+		char commonCharacter = '*';
+
+		for (int characterIndex = 0; characterIndex < smallestString.length(); characterIndex++) {
+			for (int stringIndex = 0; stringIndex < testClassListModel.size(); stringIndex++) {
+				if (stringIndex == 0) {
+					commonCharacter = testClassListModel.get(0).charAt(characterIndex);
+					continue;
+				}
+				if (testClassListModel.get(stringIndex).charAt(characterIndex) != commonCharacter) {
+					String commonPrefix = smallestString.substring(0, characterIndex);
+					int lastDot = commonPrefix.lastIndexOf('.');
+					if (lastDot == -1) {
+						return "";
+					}
+					return commonPrefix.substring(0, lastDot + 1)+"*";
+				}
+			}
+		}
+
+		int lastDot = smallestString.lastIndexOf('.');
+		
+		if (lastDot == -1) {
+			return "";
+		}
+
+		return smallestString.substring(0, lastDot + 1)+"*";
 	}
 
 }
