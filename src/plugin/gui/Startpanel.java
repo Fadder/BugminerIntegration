@@ -3,6 +3,7 @@
  */
 package plugin.gui;
 
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -67,6 +68,7 @@ public class Startpanel extends JFrame {
 		// getContentPane().add(panel2, 1);
 		// getContentPane().add(panel3, 1);
 
+		/*// This part is also unnecessary.
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -74,7 +76,8 @@ public class Startpanel extends JFrame {
 		menuBar.add(mnNewMenu);
 
 		mntmBeedtruiea = new JMenuItem("Select");
-		mnNewMenu.add(mntmBeedtruiea);
+		mnNewMenu.add(mntmBeedtruiea);*/
+		
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		// Group the radio buttons.
@@ -134,13 +137,13 @@ public class Startpanel extends JFrame {
 		// lblNewLabel = new JLabel("New label");
 		// getContentPane().add(lblNewLabel);
 
-		/* // This choose panel is not needed, so commented out, for now. 
-		btnChooseFile = new JButton("Choose file");
+		/*// (This choose panel is not needed, so commented out, for now.)
+		btnChooseFile = new JButton("Choose directory");
 
 		panel1.add(btnChooseFile);
 		l = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(chooseFile());
+				path = chooseFile();
 			}
 		};
 
@@ -158,12 +161,18 @@ public class Startpanel extends JFrame {
 		};
 		startButton.addActionListener(l2);
 		
-		pictureChooser = new SplitPaneDemo(path);
-		//panel1.add(pictureChooser);
+		pictureChooser = new SplitPaneDemo();
+		//pictureChooser.setPath();
+		//System.out.println("The path is: "+path);
+		//panel1.add(pictureChooser, BorderLayout.PAGE_END);
 
-		getContentPane().add(panel1, 0);
+		JPanel container = new JPanel();
+		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+		container.add(panel1);
+		container.add(pictureChooser);
+		this.add(container);
 		
-		this.setSize(500, 300);
+		this.setSize(1000, 500);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
@@ -228,6 +237,7 @@ public class Startpanel extends JFrame {
 			// Exception
 			inputPath = "";
 		}
+		System.out.println("Chosen path: " + inputPath);
 		return inputPath;
 	}
 	

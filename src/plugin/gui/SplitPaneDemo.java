@@ -33,9 +33,8 @@ public class SplitPaneDemo extends JPanel
     private String path;
 
     
-    public SplitPaneDemo(String path) {
-    	
-    	this.path = path;
+    public SplitPaneDemo() {
+    	path = setPath();
     	fileNames = readDirectory(); 
     	
         //Create the list of images and put it in a scroll pane.
@@ -144,14 +143,14 @@ public class SplitPaneDemo extends JPanel
     	return (String[]) files.toArray(new String[1]);
      }
     
-    private static String setPath(){
+    public static String setPath(){
     	JFrame frame = null;
     	
     	// make sure that plugin.graph.Settings.getPath(); has been set
     	String path = plugin.graph.Settings.getPath();
     	
     	// for testing
-    	path = "/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/";
+    	path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
     	
     	if (path == null) {
     		path = (String)JOptionPane.showInputDialog(
@@ -175,7 +174,7 @@ public class SplitPaneDemo extends JPanel
         //Create and set up the window.
         JFrame frame = new JFrame("CFG Drawer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SplitPaneDemo splitPaneDemo = new SplitPaneDemo("");
+        SplitPaneDemo splitPaneDemo = new SplitPaneDemo();
         frame.getContentPane().add(splitPaneDemo.getSplitPane());
  
         //Display the window.
