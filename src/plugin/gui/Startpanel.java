@@ -30,6 +30,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 //import java.awt.event.MouseAdapter;
 //import java.awt.event.MouseEvent;
+import java.io.File;
 
 /**
  * @author jan
@@ -41,6 +42,9 @@ public class Startpanel extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private static Startpanel startpanel;
+	
+	private String path;
+	private String outputFormat;
 
 	JMenuBar menuBar;
 	JMenu mnNewMenu;
@@ -51,10 +55,13 @@ public class Startpanel extends JFrame {
 	ActionListener l;
 	ActionListener l2;
 	JPanel panel1, panel2, panel3;
+	SplitPaneDemo pictureChooser;
 	StartSettingDialog startSettingDialog= new StartSettingDialog();
 
 	private Startpanel() {
-
+		
+		path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
+		outputFormat = "png";
 		panel1 = new JPanel();
 
 		// getContentPane().add(panel2, 1);
@@ -75,8 +82,8 @@ public class Startpanel extends JFrame {
 
 		ActionListener listenerSelectOutputType = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Fileformat set to: " + e.getActionCommand());
-				//TODO: change output format
+				//System.out.println("Fileformat set to: " + e.getActionCommand());
+				outputFormat = e.getActionCommand();
 			}
 		};
 
@@ -96,14 +103,22 @@ public class Startpanel extends JFrame {
 		ps.setMnemonic(KeyEvent.VK_B);
 		ps.setActionCommand("ps");
 		ps.setSelected(false);
+		
+		JRadioButton jpg = new JRadioButton("jpg");
+		jpg.setMnemonic(KeyEvent.VK_B);
+		jpg.setActionCommand("jpg");
+		jpg.setSelected(false);
+		
 		group.add(pdf);
 		group.add(png);
 		group.add(ps);
+		group.add(jpg);
 
 		// Register a listener for the radio buttons.
 		pdf.addActionListener(listenerSelectOutputType);
 		png.addActionListener(listenerSelectOutputType);
 		ps.addActionListener(listenerSelectOutputType);
+		jpg.addActionListener(listenerSelectOutputType);
 		panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		JPanel FileTypePanel = new JPanel();
@@ -111,7 +126,8 @@ public class Startpanel extends JFrame {
 		FileTypePanel.add(pdf);
 		FileTypePanel.add(png);
 		FileTypePanel.add(ps);
-
+		FileTypePanel.add(jpg);
+		
 		// getContentPane().add(FileTypePanel);
 
 		panel1.add(FileTypePanel);
@@ -135,11 +151,15 @@ public class Startpanel extends JFrame {
 		panel1.add(startButton);
 		l2 = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				startSettingDialog.setOutputType(outputFormat); // Change output format
 				startSettingDialog.refreshTestClasses();
 				startSettingDialog.setVisible(true);
 			}
 		};
 		startButton.addActionListener(l2);
+		
+		pictureChooser = new SplitPaneDemo(path);
+		//panel1.add(pictureChooser);
 
 		getContentPane().add(panel1, 0);
 		
@@ -210,5 +230,5 @@ public class Startpanel extends JFrame {
 		}
 		return inputPath;
 	}
-
+	
 }

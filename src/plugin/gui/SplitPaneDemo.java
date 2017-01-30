@@ -28,10 +28,12 @@ public class SplitPaneDemo extends JPanel
     private JList<?> list;
     private JSplitPane splitPane;
     private String[] fileNames;
-    private static String path = setPath();
+    private String path;
 
     
-    public SplitPaneDemo() {
+    public SplitPaneDemo(String path) {
+    	
+    	this.path = path;
     	fileNames = readDirectory(); 
     	
         //Create the list of images and put it in a scroll pane.
@@ -148,7 +150,7 @@ public class SplitPaneDemo extends JPanel
         }
     }*/
  
-    private static String[] readDirectory() {
+    private String[] readDirectory() {
  	   	System.out.println("readDirectory "+ path);
     	ArrayList<String> files = new  ArrayList<String>();
     	File folder = new File(path);
@@ -189,12 +191,12 @@ public class SplitPaneDemo extends JPanel
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private static void createAndShowGUI() {
+    private void createAndShowGUI() {
  
         //Create and set up the window.
         JFrame frame = new JFrame("CFG Drawer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SplitPaneDemo splitPaneDemo = new SplitPaneDemo();
+        SplitPaneDemo splitPaneDemo = new SplitPaneDemo("");
         frame.getContentPane().add(splitPaneDemo.getSplitPane());
  
         //Display the window.
@@ -202,7 +204,7 @@ public class SplitPaneDemo extends JPanel
         frame.setVisible(true);
     }
  
-    public static void main(String[] args) {
+    public void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

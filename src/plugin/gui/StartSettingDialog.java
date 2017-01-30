@@ -58,6 +58,8 @@ public class StartSettingDialog extends JDialog {
 	private IProject selectedProject;
 	private Map<IProject, Collection<String>> testClassCache = new HashMap<>();
 	JTextField scopeTextField = new JTextField();;
+	
+	private String outputType; // Pictures will be saved in this format.
 
 	/**
 	 * 
@@ -175,6 +177,7 @@ public class StartSettingDialog extends JDialog {
 
 						// Create Graph (plugin) from the TestCaseStream
 						GraphDrawer gd = new GraphDrawer(testCaseStream, selectedProject, monitor);
+						gd.setType(outputType);
 						gd.run();
 
 						return Status.OK_STATUS;
@@ -366,6 +369,10 @@ public class StartSettingDialog extends JDialog {
 		}
 
 		return smallestString.substring(0, lastDot + 1)+"*";
+	}
+	
+	public void setOutputType(String newType) {
+		outputType = newType;
 	}
 
 }

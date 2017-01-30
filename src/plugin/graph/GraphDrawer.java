@@ -87,6 +87,10 @@ public class GraphDrawer implements Runnable {
 		
 	}
 	
+	public void setType(String newType) {
+		graph.setType(newType);
+	}
+	
 	// Deletes old graph.
 	private void resetGraph() {
 		graph.reset();
