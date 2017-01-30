@@ -85,48 +85,9 @@ public class Settings {
 		// If we test the Threads or not. They still require some work...
 		boolean decision = true;
 
-		if (decision) {
-			testThreads();
-			return;
-		}
 
-		Graph g = new Graph();
-		g.addEdge(5, 1, 1);
-
-		g.pictureToScreen(g.dotToImage(g.saveAsDot()));
 	}
 
-	/** 
-	 * A function to test the new Threads, so that we don't spam the main function.
-	 */
-	private static void testThreads() {
-		Graph g = new Graph();
 
-		// Trying the new threads for input.
-		PipedWriter pw = new PipedWriter();
-		PipedReader pr;
-		try {
-			pr = new PipedReader(pw);
-			// System.out.println("Pipe successfully created.");
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		pipeInputThread pit = new pipeInputThread(pw);
-		pipeGraphThread pgt = new pipeGraphThread(pr);
-		pit.start();
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			System.out.println("Errorerror!");
-			e.printStackTrace();
-		}
-		System.out.println("PGT starts immediately.");
-		pgt.run();
-		System.out.println("PGT started.");
-		g = pgt.getGraph();
-		System.out.println("Graph received.");
-		g.pictureToScreen(g.dotToImage(g.saveAsDot()));
-	}
 
 }
