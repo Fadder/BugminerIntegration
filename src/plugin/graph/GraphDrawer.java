@@ -35,6 +35,9 @@ public class GraphDrawer implements Runnable {
 	@Override
 	public void run() {
 		
+		graph.setPath(projectFolder.getAbsolutePath());
+		System.out.println("New path: " + projectFolder.getAbsolutePath());
+		
 		while (true) { // Maybe some break condition?
 			try {
 				TestCase tc;
@@ -47,6 +50,9 @@ public class GraphDrawer implements Runnable {
 				
 				// Build graph here.
 				for(MethodGraph methodgraph: tc.getCollectionMethodGraphs()){
+					String filename = tc.getId() + "_" + methodgraph.getMethodId();
+					System.out.println("New filename: " + filename);
+					graph.setFilename(filename);
 					graph=new Graph();
 					testcaseToGraph(methodgraph);
 					graph.pictureToScreen(graph.dotToImage(graph.saveAsDot()));

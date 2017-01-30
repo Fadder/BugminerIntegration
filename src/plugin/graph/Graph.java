@@ -23,13 +23,16 @@ public class Graph {
 	public Instruction firstinst;
 
 	
-	private String filename = "graph"; // name of your output files, default is graph
-	private String type = "png"; // Type of the picture file eg  png, pdf. Default is png.
-	private String path = ""; /*System.getProperty("user.dir");*/ // A general path to the working directory.
+	private String filename; // name of your output files, default is graph
+	private String type; // Type of the picture file eg  png, pdf. Default is png.
+	private String path; /*System.getProperty("user.dir");*/ // A general path to the working directory.
 	
 	
 	public Graph() {
 		this.firstinst = null;
+		filename = "graph";
+		type = "png";
+		path = "";
 	}
 
 	// Simply add a new edge to the graph or updates the counter.
@@ -158,7 +161,7 @@ public class Graph {
 			return;
 		}
 
-		System.out.println("Picture file read in. Path is: " + sourcePath);
+		//System.out.println("Picture file read in. Path is: " + sourcePath);
 		File out = new File(sourcePath);
 		BufferedImage img = null;
 		try {
@@ -234,7 +237,8 @@ public class Graph {
 		// Write graph to picture file.
 		File out = new File(path + filename + "." + type);
 		gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type, "dot"), out);
-
+		System.out.println("The new File's path: "+ out.getAbsolutePath());
+		
 		return path + filename + "." + type;
 	}
 	
