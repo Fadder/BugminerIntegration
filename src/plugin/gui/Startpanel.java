@@ -161,15 +161,12 @@ public class Startpanel extends JFrame {
 		};
 		startButton.addActionListener(l2);
 		
-		pictureChooser = new SplitPaneDemo();
-		//pictureChooser.setPath();
-		//System.out.println("The path is: "+path);
-		//panel1.add(pictureChooser, BorderLayout.PAGE_END);
+		//pictureChooser = new SplitPaneDemo();
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		container.add(panel1);
-		container.add(pictureChooser);
+		//container.add(pictureChooser);
 		this.add(container);
 		
 		this.setSize(1000, 500);

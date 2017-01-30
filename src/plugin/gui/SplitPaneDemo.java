@@ -147,10 +147,10 @@ public class SplitPaneDemo extends JPanel
     	JFrame frame = null;
     	
     	// make sure that plugin.graph.Settings.getPath(); has been set
-    	String path = plugin.graph.Settings.getPath();
+    	String path = null;// = plugin.graph.Settings.getPath();
     	
     	// for testing
-    	path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
+    	//path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
     	
     	if (path == null) {
     		path = (String)JOptionPane.showInputDialog(
