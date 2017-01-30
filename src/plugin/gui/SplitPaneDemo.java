@@ -18,6 +18,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import plugin.graph.Graph;
+
 import java.util.*;
  
 //SplitPaneDemo itself is not a visible component.
@@ -64,93 +66,68 @@ public class SplitPaneDemo extends JPanel
  
         //Provide a preferred size for the split pane.
         splitPane.setPreferredSize(new Dimension(800, 400));
-      //  updateLabel(fileNames[list.getSelectedIndex()]);
+        //updateLabel(fileNames[list.getSelectedIndex()]);
         
-      
     }
      
-    
-    public JSplitPane getSplitPane() {
-        return splitPane;
-    }
     
     //Listens to the list
     public void valueChanged(ListSelectionEvent e) {
         JList list = (JList)e.getSource();
-        ActionListener loadImage = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-            	setImage(getImage());
-            }
-        };
-        //updateLabel(path +fileNames[list.getSelectedIndex()]);
+        updateLabel(fileNames[list.getSelectedIndex()]);
     }
-     
+    
     //Renders the selected image
-/*     protected void updateLabel (String name) {
-    	BufferedImage wPic;
+    protected void updateLabel (String name) {
+    	
+        BufferedImage image = null;
+        ImageIcon icon;
 		try {
-			wPic = ImageIO.read(this.getClass().getResource(name));
-			JLabel wIcon = new JLabel(new ImageIcon(wPic));
+			image = ImageIO.read(new File(path + name));
+			System.out.println("bi created for " + name);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-    }
-   protected void updateLabel (String fullPath) {
-        ImageIcon icon = createImageIcon(fullPath);
-        picture.add(imageCanvas);
-        if  (icon != null) {
+		icon = new ImageIcon(image);
+		if  (icon != null) {
             picture.setText(null);
         } else {
-            picture.setText("Image not found");
+            picture.setText(name + " not a picture or file not found.");
         }
-    }
-   
-  */
- 
-    /** Set the image as icon of the image canvas (display it). */
-    public void setImage(Image image) {
-        imageCanvas.setIcon(new ImageIcon(image));
-    }
-    
-    public static Image getImage() {
-
-        BufferedImage bi = null;
-		try {
-			bi = ImageIO.read(new File("/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/graph1.jpg"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("error");
-			e.printStackTrace();
-		}if (bi == null) System.out.println("hier Fehler");
-		return bi;
-    }
-    /** Returns an ImageIcon, or null if the path was invalid. 
-    protected static ImageIcon createImageIcon(String fullPath) {
+			
+		
+		picture.setIcon(icon);
     	
-    	System.out.println(fullPath); 
-       java.net.URL imgURL = null;
-	try {
-		imgURL = new java.net.URL(fullPath);
-	} catch (MalformedURLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-       System.out.println("create image " + imgURL);
+		/*
+        ImageIcon icon = createImageIcon(path + name);
+         System.out.println("Icon not created, why??");
+        Graph g = new Graph();
+        g.pictureToScreen(path + name);
+        picture.setIcon(icon);
+        
+        */
+    }
+
+
+    public JSplitPane getSplitPane() {
+        return splitPane;
+    }
+
+   
+    /** Returns an ImageIcon, or null if the path was invalid. */
+    protected static ImageIcon createImageIcon(String path) {
+       java.net.URL imgURL = SplitPaneDemo.class.getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
-            System.err.println("Couldn't find file: " + fullPath);
+            System.err.println("Couldn't find file: " + path);
             return null;
         }
-    }*/
+    }
  
     private static String[] readDirectory() {
- 	   	System.out.println("readDirectory "+ path);
-    	ArrayList<String> files = new  ArrayList<String>();
+ 	   	ArrayList<String> files = new  ArrayList<String>();
     	File folder = new File(path);
     	File[] listOfGraphfiles = folder.listFiles();
     	
@@ -180,7 +157,6 @@ public class SplitPaneDemo extends JPanel
     				//icon
     				);
     	}
-    	
     	return path;
     }
     

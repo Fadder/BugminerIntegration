@@ -48,7 +48,6 @@ public class ImageViewer {
 			bi = ImageIO.read(new File("/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/graph1.jpg"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("error");
 			e.printStackTrace();
 		}
 		return bi;
