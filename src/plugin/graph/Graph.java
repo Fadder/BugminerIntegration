@@ -112,6 +112,9 @@ public class Graph {
 
 		GraphViz gv = new GraphViz();
 		gv.addln(gv.start_graph());
+		gv.addln("labelloc = \"t\";");
+		gv.addln("label = \"" + filename + "\";");
+		gv.addln("node [shape = box];");
 		Instruction inst = firstinst;
 
 		// horizontal iteration through the different instructions
@@ -122,12 +125,15 @@ public class Graph {
 			// on every instruction vertical iteration through all the edges
 			// from that instr.
 			while (edge != null) {
-				int edgeTo = edge.getID(); // The instruction to which the edge
-											// leads.
+				int edgeTo = edge.getID(); // The instruction to which the edge leads.
 				int label = edge.getNum();
-				String out = Integer.toString(id) + " -> " + edgeTo
-						+ " [label=\"" + label + "\"];";
-
+				String out;
+				if (id == -1) {
+					out = "Start -> " + edgeTo + " [label=\"" + label + "\"];";
+				} else {
+					out = Integer.toString(id) + " -> " + edgeTo + " [label=\"" + label + "\"];";
+				}
+				
 				gv.addln(out);
 				edge = edge.getNext();
 			}
@@ -156,7 +162,7 @@ public class Graph {
 	public void pictureToScreen(String sourcePath) {
 		// If the file format is not png, we call an extern program to open the
 		// picture.
-		if (!type.equals("png")) {
+		if (type.equals("pdf") || type.equals("ps")) {
 			pdfToPicture(sourcePath);
 			return;
 		}
@@ -237,13 +243,16 @@ public class Graph {
 		// Write graph to picture file.
 		File out = new File(path + filename + "." + type);
 		gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type, "dot"), out);
-		System.out.println("The new File's path: "+ out.getAbsolutePath());
 		
 		return path + filename + "." + type;
 	}
 	
 	public void setFilename(String name) {
 		filename = name;
+	}
+	
+	public String getFilename() {
+		return filename;
 	}
 	
 	public void setType(String new_type) {
@@ -256,6 +265,10 @@ public class Graph {
 	
 	public void setPath(String newPath) {
 		path = newPath;
+	}
+	
+	public void reset() {
+		firstinst = null;
 	}
 
 }
