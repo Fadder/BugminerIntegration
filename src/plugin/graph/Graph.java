@@ -237,13 +237,16 @@ public class Graph {
 		// Write graph to picture file.
 		File out = new File(path + filename + "." + type);
 		gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type, "dot"), out);
-		System.out.println("The new File's path: "+ out.getAbsolutePath());
 		
 		return path + filename + "." + type;
 	}
 	
 	public void setFilename(String name) {
 		filename = name;
+	}
+	
+	public String getFilename() {
+		return filename;
 	}
 	
 	public void setType(String new_type) {
@@ -256,6 +259,10 @@ public class Graph {
 	
 	public void setPath(String newPath) {
 		path = newPath;
+	}
+	
+	public void reset() {
+		firstinst = null;
 	}
 
 }
