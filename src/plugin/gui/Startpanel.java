@@ -12,11 +12,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-
 import java.awt.BorderLayout;
 
 import java.awt.FlowLayout;
-
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
@@ -42,7 +40,7 @@ public class Startpanel extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private static Startpanel startpanel;
-	
+
 	private String path;
 	private String outputFormat;
 
@@ -56,10 +54,10 @@ public class Startpanel extends JFrame {
 	ActionListener l2;
 	JPanel panel1, panel2, panel3;
 	SplitPaneDemo pictureChooser;
-	StartSettingDialog startSettingDialog= new StartSettingDialog();
+	StartSettingDialog startSettingDialog = new StartSettingDialog();
 
 	private Startpanel() {
-		
+
 		path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
 		outputFormat = "png";
 		panel1 = new JPanel();
@@ -82,7 +80,8 @@ public class Startpanel extends JFrame {
 
 		ActionListener listenerSelectOutputType = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//System.out.println("Fileformat set to: " + e.getActionCommand());
+				// System.out.println("Fileformat set to: " +
+				e.getActionCommand();
 				outputFormat = e.getActionCommand();
 			}
 		};
@@ -103,12 +102,12 @@ public class Startpanel extends JFrame {
 		ps.setMnemonic(KeyEvent.VK_B);
 		ps.setActionCommand("ps");
 		ps.setSelected(false);
-		
+
 		JRadioButton jpg = new JRadioButton("jpg");
 		jpg.setMnemonic(KeyEvent.VK_B);
 		jpg.setActionCommand("jpg");
 		jpg.setSelected(false);
-		
+
 		group.add(pdf);
 		group.add(png);
 		group.add(ps);
@@ -127,50 +126,49 @@ public class Startpanel extends JFrame {
 		FileTypePanel.add(png);
 		FileTypePanel.add(ps);
 		FileTypePanel.add(jpg);
-		
+
 		// getContentPane().add(FileTypePanel);
 
 		panel1.add(FileTypePanel);
 		// lblNewLabel = new JLabel("New label");
 		// getContentPane().add(lblNewLabel);
 
-		/* // This choose panel is not needed, so commented out, for now. 
-		btnChooseFile = new JButton("Choose file");
-
-		panel1.add(btnChooseFile);
-		l = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println(chooseFile());
-			}
-		};
-
-		btnChooseFile.addActionListener(l);*/
+		/*
+		 * // This choose panel is not needed, so commented out, for now.
+		 * btnChooseFile = new JButton("Choose file");
+		 * 
+		 * panel1.add(btnChooseFile); l = new ActionListener() { public void
+		 * actionPerformed(ActionEvent e) { System.out.println(chooseFile()); }
+		 * };
+		 * 
+		 * btnChooseFile.addActionListener(l);
+		 */
 
 		startButton = new JButton("START");
 
 		panel1.add(startButton);
 		l2 = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				startSettingDialog.setOutputType(outputFormat); // Change output format
+				startSettingDialog.setOutputType(outputFormat); // Change output
+																// format
 				startSettingDialog.refreshTestClasses();
 				startSettingDialog.setVisible(true);
 			}
 		};
 		startButton.addActionListener(l2);
-		
-		pictureChooser = new SplitPaneDemo(path);
-		//panel1.add(pictureChooser);
 
+		pictureChooser = new SplitPaneDemo(path);
+	
 		getContentPane().add(panel1, 0);
-		
+
 		this.setSize(500, 300);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
-		this.addWindowListener(new WindowAdapter(){
+
+		this.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent evt){
-				startpanel=null;
+			public void windowClosing(WindowEvent evt) {
+				startpanel = null;
 				System.out.println("Startpanel destroyed");
 			}
 		});
@@ -180,41 +178,27 @@ public class Startpanel extends JFrame {
 	/**
 	 * @param args
 	 */
-	/*
-	 * public static void main(String[] args) {
-	 * stub createAndStartPanel(); }
-	 */
+
+	public static void main(String[] args) {
+		//Create and set up the window.
+        JFrame frame = new JFrame("CFG Drawer");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        SplitPaneDemo splitPaneDemo = new SplitPaneDemo("/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/");
+        frame.getContentPane().add(splitPaneDemo.getSplitPane());
+ 
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+	}
 
 	public static void openPanel() {
-		if(startpanel==null){
-			startpanel=new Startpanel();
+		if (startpanel == null) {
+			startpanel = new Startpanel();
 			System.out.println("Startpanel generated");
 		}
 		startpanel.setVisible(true);
 
 	}
-
-//	private static void addPopup(Component component, final JPopupMenu popup) {
-//		component.addMouseListener(new MouseAdapter() {
-//			public void mousePressed(MouseEvent e) {
-//				if (e.isPopupTrigger()) {
-//					showMenu(e);
-//				}
-//			}
-//
-//			public void mouseReleased(MouseEvent e) {
-//				if (e.isPopupTrigger()) {
-//					showMenu(e);
-//				}
-//			}
-//
-//			private void showMenu(MouseEvent e) {
-//				popup.show(e.getComponent(), e.getX(), e.getY());
-//			}
-//		});
-//	}
-
-	
 
 	public String chooseFile() {
 		JFileChooser chooser = new JFileChooser();
@@ -230,5 +214,5 @@ public class Startpanel extends JFrame {
 		}
 		return inputPath;
 	}
-	
+
 }
