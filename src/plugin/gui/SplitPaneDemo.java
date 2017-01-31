@@ -4,47 +4,36 @@
 package plugin.gui;
 
 /**
- * @author jan
- *
+ * SplitPaneDemo(directory) reads the directory and displays a window with the content of the directory on the right and rendered images on the left
+ * TODO: where to get the path from? Displayed as a single frame or a panel?
  */
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
-
-import plugin.graph.Graph;
-
 import java.util.*;
  
 //SplitPaneDemo itself is not a visible component.
 public class SplitPaneDemo extends JPanel
                           implements ListSelectionListener {
     private JLabel picture;
-    private JLabel imageCanvas;
     private JList<?> list;
     private JSplitPane splitPane;
     private String[] fileNames;
-    private String path;
+    private String path;// = setPath();
 
-    
     public SplitPaneDemo(String path) {
-    	
     	this.path = path;
     	fileNames = readDirectory(); 
     	
         //Create the list of images and put it in a scroll pane.
-         
-        list = new JList(fileNames);
+        list = new JList<String>(fileNames);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
         list.addListSelectionListener(this);
-         
         
         JScrollPane listScrollPane = new JScrollPane(list);
         picture = new JLabel();
@@ -64,12 +53,8 @@ public class SplitPaneDemo extends JPanel
         listScrollPane.setMinimumSize(minimumSize);
         pictureScrollPane.setMinimumSize(minimumSize);
 
-       // pictureScrollPane.add(imageCanvas);
- 
         //Provide a preferred size for the split pane.
         splitPane.setPreferredSize(new Dimension(800, 400));
-        //updateLabel(fileNames[list.getSelectedIndex()]);
-        
     }
      
     
@@ -79,36 +64,27 @@ public class SplitPaneDemo extends JPanel
         updateLabel(fileNames[list.getSelectedIndex()]);
     }
     
-    //Renders the selected image
+    /**
+     * Renders the selected image or displays an error message if not an image has been chosen
+     * 
+     * @param name full path of the selected image
+     */
     protected void updateLabel (String name) {
     	
         BufferedImage image = null;
-        ImageIcon icon;
 		try {
 			image = ImageIO.read(new File(path + name));
-			System.out.println("bi created for " + name);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("javax.imageio.IIOException: Can't read input file!");
 		}
-		icon = new ImageIcon(image);
-		if  (icon != null) {
-            picture.setText(null);
-        } else {
-            picture.setText(name + " not a picture or file not found.");
-        }
-			
-		
-		picture.setIcon(icon);
-    	
-		/*
-        ImageIcon icon = createImageIcon(path + name);
-         System.out.println("Icon not created, why??");
-        Graph g = new Graph();
-        g.pictureToScreen(path + name);
-        picture.setIcon(icon);
-        
-        */
+		try {
+			picture.setIcon(new ImageIcon(image, name));
+			picture.setText(null);
+            
+		} catch (NullPointerException e){
+			picture.setText(name + " cannot be displayed.");
+			picture.setIcon(null);
+		}
     }
 
 
@@ -116,23 +92,11 @@ public class SplitPaneDemo extends JPanel
         return splitPane;
     }
 
-   
-    /** Returns an ImageIcon, or null if the path was invalid. */
-    protected static ImageIcon createImageIcon(String path) {
-       java.net.URL imgURL = SplitPaneDemo.class.getResource(path);
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        } else {
-            System.err.println("Couldn't find file: " + path);
-            return null;
-        }
-    }
- 
-
+    
+    /** reads the directory and puts all filenames in a list to be displayed*/
     private String[] readDirectory() {
 
     	ArrayList<String> files = new  ArrayList<String>();
-
     	File folder = new File(path);
     	File[] listOfGraphfiles = folder.listFiles();
     	
@@ -151,7 +115,7 @@ public class SplitPaneDemo extends JPanel
     	String path = plugin.graph.Settings.getPath();
     	
     	// for testing
-    	path = "/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/";
+    	//path = "/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/";
     	
     	if (path == null) {
     		path = (String)JOptionPane.showInputDialog(
@@ -159,23 +123,22 @@ public class SplitPaneDemo extends JPanel
     				"Path for graph image files not found or empty.\n Please choose path:",
     				"CFG: Error",
     				JOptionPane.QUESTION_MESSAGE
-    				//icon
-    				);
+     				);
     	}
     	return path;
     }
-    
+
     /**
-     * Create the GUI and show it.  For thread safety,
+     * Create the GUI and show it for debugging.  For thread safety,
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private void createAndShowGUI() {
+    private static void createAndShowGUI() {
  
         //Create and set up the window.
         JFrame frame = new JFrame("CFG Drawer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SplitPaneDemo splitPaneDemo = new SplitPaneDemo("");
+        SplitPaneDemo splitPaneDemo = new SplitPaneDemo("/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/");
         frame.getContentPane().add(splitPaneDemo.getSplitPane());
  
         //Display the window.
@@ -183,15 +146,14 @@ public class SplitPaneDemo extends JPanel
         frame.setVisible(true);
     }
  
-    public void main(String[] args) {
+    public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI();
+            	createAndShowGUI();
             }
         });
-    }
- 
+    } 
        
 }
