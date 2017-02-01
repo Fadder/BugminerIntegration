@@ -22,7 +22,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 public class ClasspathResolver {
-	private static String separator = System.getProperty("os.name").toLowerCase().contains("windows") ? ";" : ":";
 
 	/**
 	 * Gibt den classpath der zum debuggen des Projekts notwendig ist zur�ck
@@ -46,10 +45,10 @@ public class ClasspathResolver {
 		classpathBuilder.append('\"');
 
 		for (String dependencies : getProjectDependencies(javaProject)) {
-			classpathBuilder.append(dependencies).append(separator);
+			classpathBuilder.append(dependencies).append(File.pathSeparatorChar);
 		}
 		for (String dependencies : getExecutorDependencies()) {
-			classpathBuilder.append(dependencies).append(separator);
+			classpathBuilder.append(dependencies).append(File.pathSeparatorChar);
 		}
 
 		classpathBuilder.deleteCharAt(classpathBuilder.length() - 1);

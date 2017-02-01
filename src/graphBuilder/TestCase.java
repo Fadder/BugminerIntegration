@@ -11,6 +11,16 @@ public class TestCase {
 	private HashMap<String,MethodGraph> methodGraphs = new HashMap<>();
     private boolean isSuccessful;
     
+    public static TestCase newLastTestCase(){
+    	TestCase last = new TestCase();
+    	last.setId("FINISHED");
+    	return last;
+    }
+    
+    public boolean isLast(){
+    	return this.id.equals("FINISHED");
+    }
+    
     public void update(Edge edge){
     	MethodGraph methodGraph = methodGraphs.computeIfAbsent(edge.getMethod(), k -> new MethodGraph(edge.getMethod()));
         methodGraph.update(edge);
