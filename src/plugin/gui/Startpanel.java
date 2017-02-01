@@ -57,7 +57,7 @@ public class Startpanel extends JFrame {
 	ActionListener l2;
 	JPanel panel1, panel2, panel3;
 	SplitPaneDemo pictureChooser;
-	StartSettingDialog startSettingDialog= new StartSettingDialog();
+	StartSettingDialog startSettingDialog= new StartSettingDialog(this);
 
 	private Startpanel() {
 		
@@ -161,12 +161,12 @@ public class Startpanel extends JFrame {
 		};
 		startButton.addActionListener(l2);
 		
-		//pictureChooser = new SplitPaneDemo();
+		//pictureChooser = new SplitPaneDemo(null);
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		container.add(panel1);
-		//container.add(pictureChooser);
+		//container.add(pictureChooser.getSplitPane());
 		this.add(container);
 		
 		this.setSize(1000, 500);
@@ -236,6 +236,16 @@ public class Startpanel extends JFrame {
 		}
 		System.out.println("Chosen path: " + inputPath);
 		return inputPath;
+	}
+
+	
+	/*
+	 * This function is called after the new testcases have been chosen.
+	 * The splitpane is refreshed to show the newest graph-images.
+	 */
+	public void refreshSplitPane(String projectpath) {
+		pictureChooser = new SplitPaneDemo(projectpath);
+		
 	}
 	
 }

@@ -221,7 +221,7 @@ public class Graph {
 			File pdfFile = new File(sourcePath);
 			Desktop.getDesktop().open(pdfFile);
 		} catch (IOException ex) {
-			System.out.println("No application found for reading pdf.");
+			System.out.println("No application found for reading this file.");
 			// no application registered for PDFs
 		}
 

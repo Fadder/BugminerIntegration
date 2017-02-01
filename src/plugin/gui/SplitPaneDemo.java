@@ -33,8 +33,8 @@ public class SplitPaneDemo extends JPanel
     private String path;
 
     
-    public SplitPaneDemo() {
-    	path = setPath();
+    public SplitPaneDemo(String path) {
+    	path = setPath(path);
     	fileNames = readDirectory(); 
     	
         //Create the list of images and put it in a scroll pane.
@@ -63,7 +63,7 @@ public class SplitPaneDemo extends JPanel
         listScrollPane.setMinimumSize(minimumSize);
         pictureScrollPane.setMinimumSize(minimumSize);
 
-       // pictureScrollPane.add(imageCanvas);
+        // pictureScrollPane.add(imageCanvas);
  
         //Provide a preferred size for the split pane.
         splitPane.setPreferredSize(new Dimension(800, 400));
@@ -88,6 +88,8 @@ public class SplitPaneDemo extends JPanel
 			System.out.println("bi created for " + name);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			/*System.out.println("Error! Image not found.");
+			System.out.println(path + name + "\n");*/
 			e.printStackTrace();
 		}
 		icon = new ImageIcon(image);
@@ -143,14 +145,15 @@ public class SplitPaneDemo extends JPanel
     	return (String[]) files.toArray(new String[1]);
      }
     
-    public static String setPath(){
+    public static String setPath(String path){
     	JFrame frame = null;
     	
-    	// make sure that plugin.graph.Settings.getPath(); has been set
-    	String path = null;// = plugin.graph.Settings.getPath();
+    	// Set valid path, or continue with default input.
+    	if (path != null && !path.equals("")) return path;
     	
     	// for testing
-    	//path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
+    	//path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt/";
+    	path = "/";
     	
     	if (path == null) {
     		path = (String)JOptionPane.showInputDialog(
@@ -169,12 +172,12 @@ public class SplitPaneDemo extends JPanel
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private void createAndShowGUI() {
+    private static void createAndShowGUI() {
  
         //Create and set up the window.
         JFrame frame = new JFrame("CFG Drawer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SplitPaneDemo splitPaneDemo = new SplitPaneDemo();
+        SplitPaneDemo splitPaneDemo = new SplitPaneDemo(null);
         frame.getContentPane().add(splitPaneDemo.getSplitPane());
  
         //Display the window.
@@ -182,7 +185,7 @@ public class SplitPaneDemo extends JPanel
         frame.setVisible(true);
     }
  
-    public void main(String[] args) {
+    public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
