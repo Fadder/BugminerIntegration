@@ -29,6 +29,7 @@ public final class Controller implements Runnable{
 	        try {
 	            Edge currentEdge = inputStream.take();
 	            if(currentEdge.isFinished()){
+	            	outputStream.put(TestCase.newLastTestCase());
 	            	return false;
 	            }
 	            if(currentEdge.isTestCaseFinished()){
