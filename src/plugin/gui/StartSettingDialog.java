@@ -2,6 +2,7 @@ package plugin.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,11 +61,14 @@ public class StartSettingDialog extends JDialog {
 	JTextField scopeTextField = new JTextField();;
 	
 	private String outputType; // Pictures will be saved in this format.
+	private Startpanel startpanel; // To have connection back to its Startpanel.
 
 	/**
 	 * 
 	 */
-	public StartSettingDialog() {
+	public StartSettingDialog(Startpanel sp) {
+		
+		startpanel = sp;
 
 		// ========== Labels ==========
 
@@ -200,6 +204,11 @@ public class StartSettingDialog extends JDialog {
 				executionJob.schedule();
 				consumerJob.schedule();
 				drawerJob.schedule();
+				/*
+				// What if the directory if loaded before the drawerJob is finished?
+				File temp = new File(selectedProject.getLocationURI());
+				// Show the image files in the directory of the project.
+				startpanel.refreshSplitPane(temp.getAbsolutePath());*/
 
 				// graphBuilderThr.start();
 				setVisible(false);
