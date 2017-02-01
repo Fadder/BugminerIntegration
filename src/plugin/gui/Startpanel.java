@@ -44,7 +44,6 @@ public class Startpanel extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static Startpanel startpanel;
 	
-	private String path;
 	private String outputFormat;
 
 	JMenuBar menuBar;
@@ -56,12 +55,11 @@ public class Startpanel extends JFrame {
 	ActionListener l;
 	ActionListener l2;
 	JPanel panel1, panel2, panel3;
-	SplitPaneDemo pictureChooser;
 	StartSettingDialog startSettingDialog= new StartSettingDialog(this);
 
 	private Startpanel() {
 		
-		path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
+		//path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
 		outputFormat = "png";
 		panel1 = new JPanel();
 
@@ -161,7 +159,7 @@ public class Startpanel extends JFrame {
 		};
 		startButton.addActionListener(l2);
 		
-		//pictureChooser = new SplitPaneDemo(null);
+		//pictureChooser = new SplitPaneDemo(/*null*/);
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
@@ -243,9 +241,9 @@ public class Startpanel extends JFrame {
 	 * This function is called after the new testcases have been chosen.
 	 * The splitpane is refreshed to show the newest graph-images.
 	 */
-	public void refreshSplitPane(String projectpath) {
-		pictureChooser = new SplitPaneDemo(projectpath);
+	/*public void refreshSplitPane(String projectpath) {
+		pictureChooser = new SplitPaneDemo();
 		
-	}
+	}*/
 	
 }

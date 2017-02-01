@@ -44,6 +44,7 @@ public class GraphDrawer implements Runnable {
 						throw new OperationCanceledException();
 					}
 				};
+				if(tc.isLast()) return;
 				if (DEBUG) System.out.println("TestCase: "+tc);
 				
 				// Build graph here.
