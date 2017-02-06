@@ -49,6 +49,7 @@ public class Startpanel extends JFrame {
 	private Startpanel() {
 		
 		outputFormat = "png";
+		panel1 = new JPanel();
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		// Group the radio buttons.

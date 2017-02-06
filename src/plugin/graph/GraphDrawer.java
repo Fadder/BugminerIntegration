@@ -1,6 +1,8 @@
 package plugin.graph;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
@@ -15,6 +17,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import graphBuilder.MethodGraph;
 import graphBuilder.TestCase;
 import graphBuilder.Transition;
+import plugin.graphviz.GraphViz;
 
 public class GraphDrawer implements Runnable {
 	
@@ -23,19 +26,21 @@ public class GraphDrawer implements Runnable {
 	private BlockingQueue<TestCase> inputStream; // The input stream where the full testcases come.
 	private IProgressMonitor monitor;
 	private File projectFolder;
+	private String path;
 	
 	public GraphDrawer(BlockingQueue<TestCase> inputStream, IProject project, IProgressMonitor monitor) {
 		graph = new Graph();
 		this.inputStream = inputStream;
 		this.monitor=SubMonitor.convert(monitor);
 		projectFolder=new File(project.getLocationURI());
+		path = projectFolder.getAbsolutePath();
 		// System.out.println(projectFolder+ " ----- " + projectFolder.exists());
 	}
 
 	@Override
 	public void run() {
 		
-		graph.setPath(projectFolder.getAbsolutePath());
+		graph.setPath(path);
 		while (true) { // Maybe some break condition?
 			try {
 				TestCase tc;
@@ -71,21 +76,49 @@ public class GraphDrawer implements Runnable {
 	
 	// Converts the TestCase objects into the plugin's Graph format.
 	private void testcaseToGraph(MethodGraph mg) {
+
+		if (DEBUG) System.out.println("    A methodgraph.");
+		Collection<Transition> collectT = mg.getListOfTransition();
+		for (Transition t : collectT) {
+			if (DEBUG) System.out.println("        A transition.");
+			int a = t.getSource();
+			int b = t.getTarget();
+			int c = t.getCount();
+			if (DEBUG) System.out.println("Transition gave the edge: " + a + "->" + b + ", " + c + " times.");
+			graph.addEdge(a, b, c);
+		}
+	}
+	
+	
+	//Writes the MethodGraph directly into the dot file, saving time on our Graph object. 
+	private String testcaseToDot(MethodGraph mg, String filename) {
 		
+		GraphViz gv = new GraphViz();
+		gv.addln(gv.start_graph());
+		gv.addln("labelloc = \"t\";");
+		gv.addln("label = \"" + filename + "\";");
+		gv.addln("node [shape = box];");
 		
-			if (DEBUG) System.out.println("    A methodgraph.");
-			Collection<Transition> collectT = mg.getListOfTransition();
-			for (Transition t: collectT) {
-				if (DEBUG) System.out.println("        A transition.");
-				int a = t.getSource();
-				int b = t.getTarget();
-				int c = t.getCount();
-				if (DEBUG) System.out.println("Transition gave the edge: "+a+"->"+b+", "+c+" times.");
-				
-				graph.addEdge(a, b, c);
-			}
+		Collection<Transition> collectT = mg.getListOfTransition();
+		for (Transition t : collectT) {
+			int a = t.getSource();
+			int b = t.getTarget();
+			int c = t.getCount();
+			graph.addEdge(a, b, c);
+		}
 		
+		gv.addln(gv.end_graph());
+		System.out.println(gv.getDotSource());
 		
+		try {
+			FileWriter writer = new FileWriter(path + filename + ".dot");
+			writer.write(gv.getDotSource());
+			writer.close();
+		} catch (IOException e) {
+			System.out.println("Error during creation of dot file: ");
+			e.printStackTrace();
+		}
+		return path + filename + ".dot";
 	}
 	
 	public void setType(String newType) {
