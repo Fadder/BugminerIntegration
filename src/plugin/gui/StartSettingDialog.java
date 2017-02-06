@@ -59,15 +59,12 @@ public class StartSettingDialog extends JDialog {
 	JTextField scopeTextField = new JTextField();;
 	
 	private String outputType; // Pictures will be saved in this format.
-	private Startpanel startpanel; // To have connection back to its Startpanel.
-
+	
 	/**
 	 * 
 	 */
-	public StartSettingDialog(Startpanel sp) {
+	public StartSettingDialog() {
 		
-		startpanel = sp;
-
 		// ========== Labels ==========
 
 		JLabel projectLabel = new JLabel("Project:");

@@ -44,9 +44,9 @@ public class Startpanel extends JFrame {
 	ActionListener l;
 	ActionListener l2;
 	JPanel panel1, panel2, panel3;
-	StartSettingDialog startSettingDialog= new StartSettingDialog(this);
+	//StartSettingDialog startSettingDialog= new StartSettingDialog(this);
 
-	private Startpanel() {
+	public Startpanel() {
 		
 		outputFormat = "png";
 		panel1 = new JPanel();
@@ -110,9 +110,9 @@ public class Startpanel extends JFrame {
 		panel1.add(startButton);
 		l2 = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				startSettingDialog.setOutputType(outputFormat); // Change output format
-				startSettingDialog.refreshTestClasses();
-				startSettingDialog.setVisible(true);
+				//startSettingDialog.setOutputType(outputFormat); // Change output format
+				//startSettingDialog.refreshTestClasses();
+				//startSettingDialog.setVisible(true);
 			}
 		};
 		startButton.addActionListener(l2);
