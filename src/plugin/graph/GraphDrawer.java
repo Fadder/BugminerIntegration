@@ -37,8 +37,10 @@ public class GraphDrawer implements Runnable {
 		// System.out.println(projectFolder+ " ----- " + projectFolder.exists());
 	}
 
-	@Override
+	@Override  
 	public void run() {
+		
+		long startTime = System.currentTimeMillis();
 		
 		graph.setPath(path);
 		while (true) { // Maybe some break condition?
@@ -57,10 +59,17 @@ public class GraphDrawer implements Runnable {
 					String filename = "/" + tc.getId() + "_" + methodgraph.getMethodId();
 					graph.reset(); // Delete previous data
 					graph.setFilename(filename);
+					
+					/* // This is the old method, with our own Graph object.
 					testcaseToGraph(methodgraph);
-					graph.dotToImage(graph.saveAsDot());
+					graph.dotToImage(graph.saveAsDot());*/  
+					
+					// New method without Graph object, faster.
+					graph.dotToImage(testcaseToDot(methodgraph, filename));
 				}
-			
+				long endTime = System.currentTimeMillis();
+				System.out.println("That took " + (endTime - startTime) + " milliseconds");
+				
 				if (DEBUG) System.out.println("One graph drawn.");
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -104,13 +113,21 @@ public class GraphDrawer implements Runnable {
 			int a = t.getSource();
 			int b = t.getTarget();
 			int c = t.getCount();
-			graph.addEdge(a, b, c);
+			//Add edge to dot.
+			String out;
+			if (a == -1) {
+				out = "Start -> " + b + " [label=\"" + c + "\"];";
+			} else {
+				out = Integer.toString(a) + " -> " + b + " [label=\"" + c + "\"];";
+			}
+			
+			gv.addln(out);
 		}
 		
 		gv.addln(gv.end_graph());
 		System.out.println(gv.getDotSource());
 		
-		try {
+		try { // Save GraphViz as a dot file.
 			FileWriter writer = new FileWriter(path + filename + ".dot");
 			writer.write(gv.getDotSource());
 			writer.close();
