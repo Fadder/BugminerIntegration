@@ -62,7 +62,7 @@ public class GraphDrawer implements Runnable {
 					
 					/* // This is the old method, with our own Graph object.
 					testcaseToGraph(methodgraph);
-					graph.dotToImage(graph.saveAsDot());*/
+					graph.dotToImage(graph.saveAsDot());*/  
 					
 					// New method without Graph object, faster.
 					graph.dotToImage(testcaseToDot(methodgraph, filename));
