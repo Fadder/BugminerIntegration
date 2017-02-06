@@ -36,6 +36,8 @@ import java.io.InputStreamReader;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import plugin.gui.StartTabbedPane;
+
 /**
  * <dl>
  * <dt>Purpose: GraphViz Java API
@@ -88,66 +90,14 @@ public class GraphViz {
 	 * to avoid hard coded paths in the programm: variables added and
 	 * setter/getter for the later used tempDir and executable
 	 */
-
 	private String tempDir;
 	private String executable;
 
-	private String winTempDir = "c:/temp";
-	private String winExe = "c:/Program Files (x86)/Graphviz 2.28/bin/dot.exe";
-	private String macTempDir = "/tmp";
-	private String macExe = "/usr/local/bin/dot";
-	private String linuxTempDir = "/tmp";
-	private String linuxExe = "/usr/bin/dot";
-
-	public String getTempDir() {
-		return tempDir;
-	}
-
-	public void setTempDir(String tempDir) {
-		
-		File dir = new File(tempDir);
-		
-		if (dir.isDirectory()){
-			this.tempDir = tempDir;
-		} else{
-			JFrame frame = new JFrame();
-			if (dir.mkdir()) {
-				JOptionPane.showMessageDialog(frame,
-						"New temporary directory '" + dir.getAbsolutePath() +"' for GraphViz created.");;
-            } else {
-				JOptionPane.showMessageDialog(frame, 
-						"Failed to create new temporary directory '" + dir.getAbsolutePath() +"' for GraphViz.",
-						tempDir, JOptionPane.ERROR_MESSAGE);;
-            }
-		}
-	}
-
-	public String getExecutable() {
-		return executable;
-	}
-
 	public void setExecutable(String executable) {
 
-		if (new File(executable).canExecute()) {
-			this.executable = executable;
-		} else {
-			JFrame frame = new JFrame();
-			while (!(new File(executable).isFile())) {
-				executable = (String) JOptionPane.showInputDialog(frame,
-						"Error: GraphViz cannot be found or executed.\n" 
-								+ "The path '" + executable
-								+ "'is not valid.\n"
-								 + "Enter the valid path of your GraphViz-Installation or abort the Programm!",
-						"Inane error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
+
 	}
-
-	/**
-	 * Detects the client's operating system.
-	 */
-	private final static String osName = System.getProperty("os.name").replaceAll("\\s", "");
-
+	//String osName = StartTabbedPane.getOsname();
 	/**
 	 * The image size in dpi. 96 dpi is normal size. Higher values are 10%
 	 * higher each. Lower values 10% lower each.
@@ -196,16 +146,7 @@ public class GraphViz {
 	 * /usr/bin/dot tempDir = /tmp
 	 */
 	public GraphViz() {
-		if (GraphViz.osName.contains("Windows")) {
-			this.tempDir = winTempDir;
-			this.executable = winExe;
-		} else if (GraphViz.osName.equals("MacOSX")) {
-			this.tempDir = macTempDir;
-			this.executable = macExe;
-		} else if (GraphViz.osName.equals("Linux")) {
-			this.tempDir = linuxTempDir;
-			this.executable = linuxExe;
-		}
+
 	}
 
 	/**
