@@ -2,7 +2,6 @@ package plugin.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +38,6 @@ import org.eclipse.jdt.core.JavaCore;
 
 import executor.monitoring.Edge;
 import executor.monitoring.ExecutionMonitor;
-import executor.monitoring.TestConsumer;
 import graphBuilder.Controller;
 import graphBuilder.TestCase;
 import plugin.graph.GraphDrawer;

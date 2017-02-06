@@ -12,26 +12,15 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-
-
 import java.awt.BorderLayout;
-
 import java.awt.FlowLayout;
-
-
 import javax.swing.JLabel;
 import javax.swing.JButton;
-//import javax.swing.JPopupMenu;
-
-//import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-//import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseEvent;
-import java.io.File;
 
 /**
  * @author jan
@@ -59,23 +48,7 @@ public class Startpanel extends JFrame {
 
 	private Startpanel() {
 		
-		//path = "C:/Users/Misi HP/Documents/Iskola/Humboldt/programok/BugminerIntegration/testprojekt";
 		outputFormat = "png";
-		panel1 = new JPanel();
-
-		// getContentPane().add(panel2, 1);
-		// getContentPane().add(panel3, 1);
-
-		/*// This part is also unnecessary.
-		menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-
-		mnNewMenu = new JMenu("Configure");
-		menuBar.add(mnNewMenu);
-
-		mntmBeedtruiea = new JMenuItem("Select");
-		mnNewMenu.add(mntmBeedtruiea);*/
-		
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		// Group the radio buttons.
@@ -128,27 +101,11 @@ public class Startpanel extends JFrame {
 		FileTypePanel.add(png);
 		FileTypePanel.add(ps);
 		FileTypePanel.add(jpg);
-		
-		// getContentPane().add(FileTypePanel);
 
 		panel1.add(FileTypePanel);
-		// lblNewLabel = new JLabel("New label");
-		// getContentPane().add(lblNewLabel);
 
-		/*// (This choose panel is not needed, so commented out, for now.)
-		btnChooseFile = new JButton("Choose directory");
-
-		panel1.add(btnChooseFile);
-		l = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				path = chooseFile();
-			}
-		};
-
-		btnChooseFile.addActionListener(l);*/
-
+		// Start Button added
 		startButton = new JButton("START");
-
 		panel1.add(startButton);
 		l2 = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -158,13 +115,10 @@ public class Startpanel extends JFrame {
 			}
 		};
 		startButton.addActionListener(l2);
-		
-		//pictureChooser = new SplitPaneDemo(/*null*/);
 
 		JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		container.add(panel1);
-		//container.add(pictureChooser.getSplitPane());
 		this.add(container);
 		
 		this.setSize(1000, 500);
@@ -184,41 +138,21 @@ public class Startpanel extends JFrame {
 	/**
 	 * @param args
 	 */
-	/*
-	 * public static void main(String[] args) {
-	 * stub createAndStartPanel(); }
-	 */
+	
+	 public static void main(String[] args) {
+		 System.out.println("Hello world");
+		 openPanel();
+		}
+	
 
 	public static void openPanel() {
-		if(startpanel==null){
-			startpanel=new Startpanel();
+		if(startpanel == null){
+			startpanel = new Startpanel();
 			System.out.println("Startpanel generated");
 		}
 		startpanel.setVisible(true);
-
 	}
 
-//	private static void addPopup(Component component, final JPopupMenu popup) {
-//		component.addMouseListener(new MouseAdapter() {
-//			public void mousePressed(MouseEvent e) {
-//				if (e.isPopupTrigger()) {
-//					showMenu(e);
-//				}
-//			}
-//
-//			public void mouseReleased(MouseEvent e) {
-//				if (e.isPopupTrigger()) {
-//					showMenu(e);
-//				}
-//			}
-//
-//			private void showMenu(MouseEvent e) {
-//				popup.show(e.getComponent(), e.getX(), e.getY());
-//			}
-//		});
-//	}
-
-	
 
 	public String chooseFile() {
 		JFileChooser chooser = new JFileChooser();
@@ -235,15 +169,5 @@ public class Startpanel extends JFrame {
 		System.out.println("Chosen path: " + inputPath);
 		return inputPath;
 	}
-
-	
-	/*
-	 * This function is called after the new testcases have been chosen.
-	 * The splitpane is refreshed to show the newest graph-images.
-	 */
-	/*public void refreshSplitPane(String projectpath) {
-		pictureChooser = new SplitPaneDemo();
-		
-	}*/
 	
 }
