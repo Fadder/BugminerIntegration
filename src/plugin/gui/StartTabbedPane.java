@@ -1,7 +1,7 @@
 /**
  * 
  */
-package plugin.graph;
+package plugin.gui;
 
 /**
  * @author jan
