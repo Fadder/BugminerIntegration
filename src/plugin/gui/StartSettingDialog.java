@@ -1,5 +1,6 @@
 package plugin.gui;
 
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -379,4 +380,9 @@ public class StartSettingDialog extends JDialog {
 		outputType = newType;
 	}
 
+	public Container getPane() {
+		return getContentPane();
+	}
+	
+	
 }
