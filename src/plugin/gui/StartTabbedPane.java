@@ -1,7 +1,7 @@
 /**
  * 
  */
-package plugin.graph;
+package plugin.gui;
 
 /**
  * @author jan
@@ -27,7 +27,7 @@ public class StartTabbedPane extends JPanel {
         JTabbedPane tabbedPane = new JTabbedPane();
         ImageIcon icon = createImageIcon("images/cfg-drawer.gif");
          
-        JComponent panel1 = makeTextPanel("Start");
+        JComponent panel1 = (JComponent) new StartSettingDialog().getPane();
         tabbedPane.addTab("Start", icon, panel1,
                 "Does nothing");
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
@@ -81,10 +81,10 @@ public class StartTabbedPane extends JPanel {
      * this method should be invoked from
      * the event dispatch thread.
      */
-    private static void createAndShowGUI() {
+    public static void createAndShowGUI() {
         //Create and set up the window.
         JFrame frame = new JFrame("StartTabbedPane");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
          
         //Add content to the window.
         frame.add(new StartTabbedPane(), BorderLayout.CENTER);

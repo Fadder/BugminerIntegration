@@ -1,6 +1,7 @@
 package plugin.graph;
 
 import plugin.gui.StartSettingDialog;
+import plugin.gui.StartTabbedPane;
 import plugin.gui.Startpanel;
 
 import org.eclipse.jface.action.IAction;
@@ -27,10 +28,16 @@ public class Plugin implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
+		
+		StartTabbedPane stp = new StartTabbedPane();
+		stp.createAndShowGUI();
+		/*
 		StartSettingDialog startSettingDialog= new StartSettingDialog();
 		startSettingDialog.setOutputType("png"); // Change output format
 		startSettingDialog.refreshTestClasses();
-		startSettingDialog.setVisible(true);
+		startSettingDialog.setVisible(true);*/
+		
+		
 		// System.out.println("Everything's fine."); for simple testing
 	}
 
