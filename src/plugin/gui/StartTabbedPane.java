@@ -107,7 +107,7 @@ public class StartTabbedPane extends JPanel {
 		}
 	}
 
-	public void setTempDir(String tempDir) {
+	public static void setTempDir(String tempDir) {
 		StartTabbedPane.tempDir = tempDir;
 	}
 
@@ -115,7 +115,7 @@ public class StartTabbedPane extends JPanel {
 		return executable;
 	}
 
-	public void setExecutable(String executable) {
+	public static void setExecutable(String executable) {
 		StartTabbedPane.executable = executable;
 	}
 
@@ -177,9 +177,10 @@ public class StartTabbedPane extends JPanel {
 		super(new GridLayout(1, 1));
 		
 		setDirOnStart();
-		System.out.println("StartTabbedPane " + StartTabbedPane.getTempDir());
+		//System.out.println("StartTabbedPane " + StartTabbedPane.getTempDir());
 		
 		ssd = new StartSettingDialog();
+		
 		JTabbedPane tabbedPane = new JTabbedPane();
 		ImageIcon icon = createImageIcon("images/cfg-drawer.gif");
 
@@ -190,7 +191,6 @@ public class StartTabbedPane extends JPanel {
 		JComponent panel2 = makeTextPanel("Output type: ");
 
 		// Create the radio buttons for the output type selection
-
 		ActionListener listenerSelectOutputType = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Fileformat set to: " + e.getActionCommand());
