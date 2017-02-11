@@ -21,6 +21,7 @@ import graphBuilder.MethodGraph;
 import graphBuilder.TestCase;
 import graphBuilder.Transition;
 import plugin.graphviz.GraphViz;
+import plugin.gui.SplitPaneDemo;
 
 public class GraphDrawer implements Runnable {
 	
@@ -57,7 +58,10 @@ public class GraphDrawer implements Runnable {
 						throw new OperationCanceledException();
 					}
 				};
-				if(tc.isLast()) return;
+				if(tc.isLast()) {
+					SplitPaneDemo.createAndShowGUI(path);
+					return;
+				}
 				if (DEBUG) System.out.println("TestCase: "+tc);
 				
 				// Build graph here.

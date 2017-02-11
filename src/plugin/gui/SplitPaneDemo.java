@@ -117,13 +117,13 @@ public class SplitPaneDemo extends JPanel
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private static void createAndShowGUI() {
+    public static void createAndShowGUI(String path) {
  
         //Create and set up the window.
         JFrame frame = new JFrame("CFG Drawer");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // To not close the Startpanel.
 
-        SplitPaneDemo splitPaneDemo = new SplitPaneDemo("/home/jan/Dropbox/SemesterprojectBugMining/workspace/BugminerIntegration/src/Testclasses/");
+        SplitPaneDemo splitPaneDemo = new SplitPaneDemo(path);
 
         frame.getContentPane().add(splitPaneDemo.getSplitPane());
  
@@ -131,15 +131,5 @@ public class SplitPaneDemo extends JPanel
         frame.pack();
         frame.setVisible(true);
     }
- 
-    public static void main(String[] args) {
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-            	createAndShowGUI();
-            }
-        });
-    } 
        
 }
