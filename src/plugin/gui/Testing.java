@@ -41,7 +41,8 @@ public class Testing {
 		tempDirField.addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				StartTabbedPane.setTempDir((String) tempDirField.getText());
+				StartTabbedPane.setTempDir(tempDirField.getText());
+				System.out.println(StartTabbedPane.getTempDir());
 			}
 
 			@Override
@@ -54,8 +55,7 @@ public class Testing {
 		exeField.addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				StartTabbedPane.setExecutable((String) exeField.getText());
-				//System.out.println(exeField.getText());
+				StartTabbedPane.setExecutable(exeField.getText());
 				System.out.println(StartTabbedPane.getExecutable());
 			}
 			
@@ -75,6 +75,7 @@ public class Testing {
 			ImageIcon icon = new ImageIcon(iconPath, iconDescription);
 			frame.setIconImage(icon.getImage());
 		}
+		
 
 		panel.add(tempDirLabel);
 		panel.add(tempDirField);

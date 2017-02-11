@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import executor.monitoring.Edge;
 import executor.monitoring.ExecutionMonitor;
@@ -60,11 +61,14 @@ public class StartSettingDialog extends JDialog {
 	JTextField scopeTextField = new JTextField();;
 	
 	private String outputType; // Pictures will be saved in this format.
+	private String exec_gv;
 	
 	/**
 	 * 
 	 */
-	public StartSettingDialog() {
+	public StartSettingDialog(String exec_gv) {
+		this.exec_gv = exec_gv;
+		outputType = "png";
 		
 		// ========== Labels ==========
 
@@ -178,6 +182,7 @@ public class StartSettingDialog extends JDialog {
 						// Create Graph (plugin) from the TestCaseStream
 						GraphDrawer gd = new GraphDrawer(testCaseStream, selectedProject, monitor);
 						gd.setType(outputType);
+						gd.setExecutable_graphviz(exec_gv);
 						gd.run();
 
 						return Status.OK_STATUS;
@@ -384,5 +389,8 @@ public class StartSettingDialog extends JDialog {
 		return getContentPane();
 	}
 	
+	public void setExecutable_graphviz(String newExec) {
+		exec_gv = newExec;
+	}
 	
 }

@@ -111,7 +111,9 @@ public class StartTabbedPane extends JPanel {
 	}
 
 	public static void setTempDir(String tempDir) {
-		StartTabbedPane.tempDir = tempDir;
+		File dir = new File(tempDir);
+		if (dir.isDirectory()) StartTabbedPane.tempDir = tempDir;
+		System.out.println(StartTabbedPane.getTempDir());
 	}
 
 	public static String getExecutable() {
@@ -119,7 +121,8 @@ public class StartTabbedPane extends JPanel {
 	}
 
 	public static void setExecutable(String executable) {
-		StartTabbedPane.executable = executable;
+		if (!new File(executable).canExecute()) StartTabbedPane.executable = executable;
+		System.out.println(StartTabbedPane.getExecutable());
 	}
 
 
@@ -176,13 +179,12 @@ public class StartTabbedPane extends JPanel {
 	 */
 
 	public StartTabbedPane() {
-		
 		super(new GridLayout(1, 1));
 		
 		setDirOnStart();
 		//System.out.println("StartTabbedPane " + StartTabbedPane.getTempDir());
 		
-		ssd = new StartSettingDialog();
+		ssd = new StartSettingDialog(executable);
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
 		// change icon if you want an icon for the tabbed panels, this is not the frame icon
@@ -204,7 +206,8 @@ public class StartTabbedPane extends JPanel {
 		ActionListener listenerSelectOutputType = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Fileformat set to: " + e.getActionCommand());
-				// outputFormat = e.getActionCommand();
+				String outputFormat = e.getActionCommand();
+				ssd.setOutputType(outputFormat);
 			}
 		};
 		JRadioButton pdf = new JRadioButton("pdf");
@@ -341,10 +344,14 @@ public class StartTabbedPane extends JPanel {
 		
 		// Set icon to frame
 		String iconPath = System.getProperty("user.dir") + "/src/images/cfg-drawer.gif";
+		iconPath = "/../../images/cfg-drawer.gif";
 		String iconDescription = "";
 		if (new File(iconPath).exists()) {
 			ImageIcon icon = new ImageIcon(iconPath, iconDescription);
+			System.out.println("Icon path");
 			frame.setIconImage(icon.getImage());
+		} else {
+			System.out.println("Path of icon "+iconPath+" not found.");
 		}
 
 		// Display the window.
