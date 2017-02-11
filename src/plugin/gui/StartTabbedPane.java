@@ -308,10 +308,11 @@ public class StartTabbedPane extends JPanel {
 		tabbedPane.addTab("Info", icon, panel3, "Here you can get same information");
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
+		/*
 		JComponent panel4 = makeTextPanel("Panel #4 (has a preferred size of 410 x 50).");
 		panel4.setPreferredSize(new Dimension(410, 50));
 		tabbedPane.addTab("Tab 4", icon, panel4, "Does nothing at all");
-		tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);
+		tabbedPane.setMnemonicAt(3, KeyEvent.VK_4);*/
 
 		// Add the tabbed pane to this panel.
 		add(tabbedPane);

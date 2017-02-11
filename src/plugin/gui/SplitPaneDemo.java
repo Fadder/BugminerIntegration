@@ -48,7 +48,7 @@ public class SplitPaneDemo extends JPanel
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, 
                                    listScrollPane, pictureScrollPane);
         splitPane.setOneTouchExpandable(true);
-        splitPane.setDividerLocation(150);
+        splitPane.setDividerLocation(300);
  
         //Provide minimum sizes for the two components in the split pane.
         Dimension minimumSize = new Dimension(100, 50);
@@ -56,7 +56,7 @@ public class SplitPaneDemo extends JPanel
         pictureScrollPane.setMinimumSize(minimumSize);
 
         //Provide a preferred size for the split pane.
-        splitPane.setPreferredSize(new Dimension(800, 400));
+        splitPane.setPreferredSize(new Dimension(1400, 700));
     }
      
     
