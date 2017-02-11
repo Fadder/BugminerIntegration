@@ -196,7 +196,7 @@ public class StartTabbedPane extends JPanel {
 		 * Tabbed panel 1 = Start
 		 */
 		JComponent panel1 = (JComponent) ssd.getPane();
-		tabbedPane.addTab("Start", icon, panel1, "Does nothing");
+		tabbedPane.addTab("Start", icon, panel1, "Choose project and start testing.");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 		/*
