@@ -85,7 +85,8 @@ public class Testing {
 		tempDirField.addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				StartTabbedPane.setTempDir((String) tempDirField.getText());
+				StartTabbedPane.setTempDir(tempDirField.getText());
+				System.out.println(StartTabbedPane.getTempDir());
 			}
 
 			@Override
@@ -116,6 +117,7 @@ public class Testing {
 			ImageIcon icon = new ImageIcon(iconPath, iconDescription);
 			frame.setIconImage(icon.getImage());
 		}
+		
 
 		panel2.add(tempDirLabel);
 		panel2.add(tempDirField);

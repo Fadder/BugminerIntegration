@@ -1,9 +1,12 @@
 package plugin.graph;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -27,9 +30,12 @@ public class GraphDrawer implements Runnable {
 	private IProgressMonitor monitor;
 	private File projectFolder;
 	private String path;
+	private String executable_graphviz;
+	private String type;
 	
 	public GraphDrawer(BlockingQueue<TestCase> inputStream, IProject project, IProgressMonitor monitor) {
 		graph = new Graph();
+		graph.set(executable_graphviz, path);
 		this.inputStream = inputStream;
 		this.monitor=SubMonitor.convert(monitor);
 		projectFolder=new File(project.getLocationURI());
@@ -65,7 +71,8 @@ public class GraphDrawer implements Runnable {
 					graph.dotToImage(graph.saveAsDot());*/  
 					
 					// New method without Graph object, faster.
-					graph.dotToImage(testcaseToDot(methodgraph, filename));
+					//graph.dotToImage(testcaseToDot(methodgraph, filename));
+					testcaseToImage(methodgraph, filename);
 				}
 				long endTime = System.currentTimeMillis();
 				System.out.println("That took " + (endTime - startTime) + " milliseconds");
@@ -83,6 +90,51 @@ public class GraphDrawer implements Runnable {
 	}
 	
 	
+	private void testcaseToImage(MethodGraph mg, String filename) {
+
+		GraphViz gv = new GraphViz(executable_graphviz, path);
+		//System.out.println("Executable in function testcasetodot: " + gv.getExecutable());
+		//gv.setExecutable(executable_graphviz);
+		gv.addln(gv.start_graph());
+		gv.addln("labelloc = \"t\";");
+		gv.addln("label = \"" + filename + "\";");
+		gv.addln("node [shape = box];");
+		
+		Collection<Transition> collectT = mg.getListOfTransition();
+		for (Transition t : collectT) {
+			int a = t.getSource();
+			int b = t.getTarget();
+			int c = t.getCount();
+			//Add edge to dot.
+			String out;
+			if (a == -1) {
+				out = "Start -> " + b + " [label=\"" + c + "\"];";
+			} else {
+				out = Integer.toString(a) + " -> " + b + " [label=\"" + c + "\"];";
+			}
+			
+			gv.addln(out);
+		}
+		gv.addln(gv.end_graph());
+		
+		
+		File picture = null;
+		File dotsource = null;
+		try { // Save GraphViz as a dot file.
+			dotsource = new File(path + filename + ".dot");
+			FileWriter writer = new FileWriter(dotsource);
+			writer.write(gv.getDotSource());
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			System.out.println("Error during creation of dot file: ");
+			e.printStackTrace();
+		}	
+		
+		picture = new File(path + filename + "." + type);
+		gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type, "dot"), picture);
+	}
+
 	// Converts the TestCase objects into the plugin's Graph format.
 	private void testcaseToGraph(MethodGraph mg) {
 
@@ -102,7 +154,9 @@ public class GraphDrawer implements Runnable {
 	//Writes the MethodGraph directly into the dot file, saving time on our Graph object. 
 	private String testcaseToDot(MethodGraph mg, String filename) {
 		
-		GraphViz gv = new GraphViz();
+		GraphViz gv = new GraphViz(executable_graphviz, path);
+		//System.out.println("Executable in function testcasetodot: " + gv.getExecutable());
+		//gv.setExecutable(executable_graphviz);
 		gv.addln(gv.start_graph());
 		gv.addln("labelloc = \"t\";");
 		gv.addln("label = \"" + filename + "\";");
@@ -125,12 +179,15 @@ public class GraphDrawer implements Runnable {
 		}
 		
 		gv.addln(gv.end_graph());
-		System.out.println(gv.getDotSource());
+		//System.out.println(gv.getDotSource());
+		//BufferedWriter dotfile = null;
 		
 		try { // Save GraphViz as a dot file.
 			FileWriter writer = new FileWriter(path + filename + ".dot");
+			//dotfile = new BufferedWriter(writer);
 			writer.write(gv.getDotSource());
 			writer.close();
+			//System.out.println("Dot saved at: " + path + filename + ".dot");
 		} catch (IOException e) {
 			System.out.println("Error during creation of dot file: ");
 			e.printStackTrace();
@@ -139,6 +196,7 @@ public class GraphDrawer implements Runnable {
 	}
 	
 	public void setType(String newType) {
+		type = newType;
 		graph.setType(newType);
 	}
 	
@@ -146,5 +204,10 @@ public class GraphDrawer implements Runnable {
 	private void resetGraph() {
 		graph.reset();
 	}
+	
+	public void setExecutable_graphviz(String newExec) {
+		executable_graphviz = newExec;
+	}
+	
 
 }

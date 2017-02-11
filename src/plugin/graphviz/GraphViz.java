@@ -94,9 +94,23 @@ public class GraphViz {
 	private String executable;
 
 	public void setExecutable(String executable) {
-
-
+		this.executable = executable;
 	}
+	
+	public String getExecutable() {
+		return executable;
+	}
+	
+	public void setTempDir(String newtd) {
+		tempDir = newtd;
+	}
+	
+	public String getTempDir() {
+		return tempDir;
+	}
+	
+	
+	
 	//String osName = StartTabbedPane.getOsname();
 	/**
 	 * The image size in dpi. 96 dpi is normal size. Higher values are 10%
@@ -146,7 +160,7 @@ public class GraphViz {
 	 * /usr/bin/dot tempDir = /tmp
 	 */
 	public GraphViz() {
-
+		
 	}
 
 	/**
@@ -262,6 +276,7 @@ public class GraphViz {
 	public int writeGraphToFile(byte[] img, File to) {
 		try {
 			FileOutputStream fos = new FileOutputStream(to);
+			//System.out.println("Executable: "+executable);
 			fos.write(img);
 			fos.close();
 		} catch (java.io.IOException ioe) {

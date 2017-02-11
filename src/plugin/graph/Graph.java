@@ -27,6 +27,8 @@ public class Graph {
 	private String type; // Type of the picture file eg  png, pdf. Default is png.
 	private String path; /*System.getProperty("user.dir");*/ // A general path to the working directory.
 	
+	private String executable;
+	private String tempdir;
 	
 	public Graph() {
 		this.firstinst = null;
@@ -110,7 +112,7 @@ public class Graph {
 	// Return the path of the saved file as String.
 	public String saveAsDot() {
 
-		GraphViz gv = new GraphViz();
+		GraphViz gv = new GraphViz(executable, tempdir);
 		gv.addln(gv.start_graph());
 		gv.addln("labelloc = \"t\";");
 		gv.addln("label = \"" + filename + "\";");
@@ -141,7 +143,7 @@ public class Graph {
 		}
 
 		gv.addln(gv.end_graph());
-		System.out.println(gv.getDotSource());
+		//System.out.println(gv.getDotSource()); //For testing.
 
 		/*
 		 * try{ BufferedWriter writer = new BufferedWriter( new
@@ -234,7 +236,7 @@ public class Graph {
 	public String dotToImage(String input) {
 
 		// Make a new Graph and create it from the input.
-		GraphViz gv = new GraphViz();
+		GraphViz gv = new GraphViz(executable, tempdir);
 		if (input == null)	{
 			input = path + filename + ".dot";
 		}
@@ -242,6 +244,10 @@ public class Graph {
 
 		// Write graph to picture file.
 		File out = new File(path + filename + "." + type);
+		/*if (out.isFile()) {
+			System.out.println("Success! " + path + filename + "." + type);
+		} else System.out.println("Error! " + path + filename + "." + type);
+			*/
 		gv.writeGraphToFile(gv.getGraph(gv.getDotSource(), type, "dot"), out);
 		
 		return path + filename + "." + type;
@@ -256,6 +262,7 @@ public class Graph {
 	}
 	
 	public void setType(String new_type) {
+		//System.out.println("New output type is: "+ new_type);
 		type = new_type;
 	}
 	
@@ -269,6 +276,11 @@ public class Graph {
 	
 	public void reset() {
 		firstinst = null;
+	}
+	
+	public void set(String exec, String tempdir) {
+		executable = exec;
+		this.tempdir = tempdir;
 	}
 
 }
