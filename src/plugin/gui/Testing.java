@@ -19,8 +19,8 @@ public class Testing {
 
 		GraphViz gv = new GraphViz();
 		// StartTabbedPane stp = new StartTabbedPane();
-		System.out.println(StartTabbedPane.getOsname());
-		System.out.println(StartTabbedPane.getTempDir());
+		//System.out.println(StartTabbedPane.getOsname());
+		//System.out.println(StartTabbedPane.getTempDir());
 		// gv.setTempDir("hello");
 		// gv.setExecutable("hello");
 
@@ -55,14 +55,12 @@ public class Testing {
 		exeField.addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				StartTabbedPane.setExecutable(exeField.getText());
-				System.out.println(StartTabbedPane.getExecutable());
+				StartTabbedPane.setExecutable((String) exeField.getText());
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
 				// TODO Auto-generated method stub
-
 			}
 		});
 
