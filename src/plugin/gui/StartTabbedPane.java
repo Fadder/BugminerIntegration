@@ -8,6 +8,7 @@ package plugin.gui;
  *
  */
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -25,6 +26,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
@@ -182,12 +185,19 @@ public class StartTabbedPane extends JPanel {
 		ssd = new StartSettingDialog();
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
-		ImageIcon icon = createImageIcon("images/cfg-drawer.gif");
-
+		// change icon if you want an icon for the tabbed panels, this is not the frame icon
+		ImageIcon icon = null;
+		
+		/*
+		 * Tabbed panel 1 = Start
+		 */
 		JComponent panel1 = (JComponent) ssd.getPane();
 		tabbedPane.addTab("Start", icon, panel1, "Does nothing");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
+		/*
+		 * Tabbed panel 2 = Settings
+		 */
 		JComponent panel2 = makeTextPanel("Output type: ");
 
 		// Create the radio buttons for the output type selection
@@ -237,10 +247,51 @@ public class StartTabbedPane extends JPanel {
 		FileTypePanel.add(ps);
 		FileTypePanel.add(jpg);
 
+		/*
+		 * Creates two labels and corresponding textfields, when these are changed and lose focus the input is set
+		 */
+		JLabel tempDirLabel = new JLabel("Temporary directory:");
+		JLabel exeFieldLabel = new JLabel("Path to GraphViz:");
+
+		JTextField tempDirField = new JTextField(StartTabbedPane.getTempDir());
+		JTextField exeField = new JTextField(StartTabbedPane.getExecutable());
+
+		tempDirField.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				StartTabbedPane.setTempDir((String) tempDirField.getText());
+			}
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		
+		exeField.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				StartTabbedPane.setExecutable((String) exeField.getText());
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				// TODO Auto-generated method stub
+			}
+		});
+		
 		panel2.add(FileTypePanel);
+		panel2.add(tempDirLabel);
+		panel2.add(tempDirField);
+		panel2.add(exeFieldLabel);
+		panel2.add(exeField);
 		tabbedPane.addTab("Settings", icon, panel2, "Does twice as much nothing");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
+		/*
+		 * Tabbed panel 3 = Info
+		 */
 		JComponent panel3 = makeTextPanel("Info");
 		tabbedPane.addTab("Info", icon, panel3, "Still does nothing");
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
