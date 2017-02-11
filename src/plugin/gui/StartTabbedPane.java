@@ -19,11 +19,13 @@ import javax.swing.JFrame;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -201,7 +203,11 @@ public class StartTabbedPane extends JPanel {
 		 * Tabbed panel 2 = Settings
 		 */
 		JComponent panel2 = makeTextPanel("Output type: ");
-
+		panel2.setLayout(new GridLayout(/*3*/ 0, 2, 6, 3));
+		
+		// Set border for the panel
+		panel2.setBorder(new EmptyBorder(new Insets(10, 10, 10, 10)));     
+		
 		// Create the radio buttons for the output type selection
 		ActionListener listenerSelectOutputType = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -241,9 +247,11 @@ public class StartTabbedPane extends JPanel {
 		png.addActionListener(listenerSelectOutputType);
 		ps.addActionListener(listenerSelectOutputType);
 		jpg.addActionListener(listenerSelectOutputType);
-		panel2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
 
 		JPanel FileTypePanel = new JPanel();
+		JLabel fileTypeLabel = new JLabel();
+		fileTypeLabel.setText("Output file type:");
 		FileTypePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		FileTypePanel.add(pdf);
 		FileTypePanel.add(png);
@@ -284,6 +292,7 @@ public class StartTabbedPane extends JPanel {
 			}
 		});
 		
+		panel2.add(fileTypeLabel);
 		panel2.add(FileTypePanel);
 		panel2.add(tempDirLabel);
 		panel2.add(tempDirField);
