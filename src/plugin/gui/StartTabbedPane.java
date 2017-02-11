@@ -292,7 +292,7 @@ public class StartTabbedPane extends JPanel {
 			}
 		});
 		
-		panel2.add(fileTypeLabel);
+		//panel2.add(fileTypeLabel);
 		panel2.add(FileTypePanel);
 		panel2.add(tempDirLabel);
 		panel2.add(tempDirField);
