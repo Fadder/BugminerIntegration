@@ -287,6 +287,14 @@ public class StartTabbedPane extends JPanel {
 
 		// Add content to the window.
 		frame.add(new StartTabbedPane(), BorderLayout.CENTER);
+		
+		// Set icon to frame
+		String iconPath = System.getProperty("user.dir") + "/src/images/cfg-drawer.gif";
+		String iconDescription = "";
+		if (new File(iconPath).exists()) {
+			ImageIcon icon = new ImageIcon(iconPath, iconDescription);
+			frame.setIconImage(icon.getImage());
+		}
 
 		// Display the window.
 		frame.pack();
