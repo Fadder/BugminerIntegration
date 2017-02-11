@@ -286,14 +286,14 @@ public class StartTabbedPane extends JPanel {
 		panel2.add(tempDirField);
 		panel2.add(exeFieldLabel);
 		panel2.add(exeField);
-		tabbedPane.addTab("Settings", icon, panel2, "Does twice as much nothing");
+		tabbedPane.addTab("Settings", icon, panel2, "Set the application paths and output files");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
 		/*
 		 * Tabbed panel 3 = Info
 		 */
 		JComponent panel3 = makeTextPanel("Info");
-		tabbedPane.addTab("Info", icon, panel3, "Still does nothing");
+		tabbedPane.addTab("Info", icon, panel3, "Here you can get same information");
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
 		JComponent panel4 = makeTextPanel("Panel #4 (has a preferred size of 410 x 50).");
