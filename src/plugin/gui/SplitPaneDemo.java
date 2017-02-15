@@ -56,7 +56,7 @@ public class SplitPaneDemo extends JPanel
         pictureScrollPane.setMinimumSize(minimumSize);
 
         //Provide a preferred size for the split pane.
-        splitPane.setPreferredSize(new Dimension(1400, 700));
+        splitPane.setPreferredSize(new Dimension(1250, 625));
     }
      
     
@@ -74,16 +74,16 @@ public class SplitPaneDemo extends JPanel
     protected void updateLabel (String name) {
     	
         BufferedImage image = null;
+        String currentpath = path + "/" + name;
 		try {
-			image = ImageIO.read(new File(path + name));
+			image = ImageIO.read(new File(currentpath));
 		} catch (IOException e) {
-
-			System.out.println("javax.imageio.IIOException: Can't read input file!");
+			System.out.println("javax.imageio.IIOException: Can't read input file!\nPath is: "+currentpath);
 		}
+		
 		try {
 			picture.setIcon(new ImageIcon(image, name));
 			picture.setText(null);
-            
 		} catch (NullPointerException e){
 			picture.setText(name + " cannot be displayed.");
 			picture.setIcon(null);

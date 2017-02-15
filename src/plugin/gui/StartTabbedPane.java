@@ -354,7 +354,9 @@ public class StartTabbedPane extends JPanel {
 		
 		// Set icon to frame
 		String iconPath = System.getProperty("user.dir") + "/src/images/cfg-drawer.gif";
-		iconPath = "/../../images/cfg-drawer.gif";
+		//iconPath = "/../../images/cfg-drawer.gif";
+		// These still not work.
+		
 		String iconDescription = "";
 		if (new File(iconPath).exists()) {
 			ImageIcon icon = new ImageIcon(iconPath, iconDescription);

@@ -224,6 +224,8 @@ public class StartSettingDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
+				JOptionPane.showMessageDialog(testClassScrollPane,
+					    "The Cancel Button is not working anymore.\nTo close this window, use the red 'X' Button in the corner.");
 			}
 		});
 
